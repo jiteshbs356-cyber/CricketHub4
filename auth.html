@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🏏 Cricket Hub — IPL 2026 | Login</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #03070d;
+  --card: #0a1628;
+  --card2: #0d1e35;
+  --border: rgba(100,150,220,0.15);
+  --gold: #f0a500;
+  --green: #00d97e;
+  --red: #ff1f3d;
+  --blue: #0ea5e9;
+  --text: #f0f4ff;
+  --muted: #64748b;
+  --secondary: #8ba3c7;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--text);
+  font-family:'Barlow',sans-serif; font-size:15px;
+  min-height:100vh; display:flex; flex-direction:column;
+  position:relative; overflow-x:hidden;
+}
+/* Animated BG */
+.bg-grid{
+  position:fixed;inset:0;z-index:0;
+  background-image:linear-gradient(rgba(14,165,233,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(14,165,233,0.03) 1px,transparent 1px);
+  background-size:48px 48px;pointer-events:none;
+}
+.bg-glow{
+  position:fixed;top:-200px;left:50%;transform:translateX(-50%);
+  width:900px;height:600px;
+  background:radial-gradient(ellipse,rgba(240,165,0,0.06),transparent 70%);
+  pointer-events:none;z-index:0;
+}
+/* HEADER */
+.auth-header{
+  position:relative;z-index:10;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1rem 2rem;
+  border-bottom:1px solid var(--border);
+  background:rgba(3,7,13,0.9);
+  backdrop-filter:blur(12px);
+}
+.auth-brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+.auth-brand-icon{font-size:1.8rem}
+.auth-brand-main{font-family:'Oswald',sans-serif;font-size:1.3rem;font-weight:700;color:var(--text);letter-spacing:1px}
+.auth-brand-sub{font-family:'Space Mono',monospace;font-size:0.58rem;color:var(--gold);letter-spacing:3px;display:block;margin-top:-2px}
+.back-link{
+  color:var(--secondary);font-size:0.82rem;text-decoration:none;
+  display:flex;align-items:center;gap:6px;
+  transition:color 0.2s;
+}
+.back-link:hover{color:var(--gold)}
+
+/* MAIN CONTENT */
+.auth-main{
+  position:relative;z-index:1;
+  flex:1;display:flex;align-items:center;justify-content:center;
+  padding:2rem 1rem;
+  min-height:calc(100vh - 60px);
+}
+.auth-container{width:100%;max-width:440px}
+
+/* TAB TOGGLE */
+.auth-tabs{
+  display:flex;background:var(--card);
+  border:1px solid var(--border);border-radius:10px;
+  padding:4px;margin-bottom:1.5rem;
+}
+.auth-tab{
+  flex:1;padding:10px;text-align:center;
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:0.88rem;font-weight:700;letter-spacing:1.5px;
+  border:none;background:transparent;color:var(--muted);
+  cursor:pointer;border-radius:7px;transition:all 0.2s;
+}
+.auth-tab.active{background:var(--gold);color:#000;}
+
+/* FORM CARD */
+.auth-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:14px;padding:2rem;
+  box-shadow:0 20px 50px rgba(0,0,0,0.4);
+  position:relative;overflow:hidden;
+}
+.auth-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--gold),#e85d04);
+}
+.auth-form{display:none}
+.auth-form.active{display:block;animation:fadeSlide 0.3s ease}
+@keyframes fadeSlide{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+.form-title{
+  font-family:'Oswald',sans-serif;font-size:1.6rem;font-weight:700;
+  letter-spacing:1px;margin-bottom:0.3rem;
+}
+.form-subtitle{font-size:0.82rem;color:var(--secondary);margin-bottom:1.5rem}
+
+/* FIELDS */
+.field{margin-bottom:1rem}
+.field label{
+  display:block;font-size:0.72rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:1px;
+  color:var(--secondary);margin-bottom:5px;
+}
+.field input,.field select{
+  width:100%;padding:11px 14px;
+  background:#060f1f;border:1.5px solid var(--border);
+  color:var(--text);border-radius:7px;font-size:0.9rem;
+  font-family:'Barlow',sans-serif;outline:none;
+  transition:border-color 0.2s,box-shadow 0.2s;
+}
+.field input:focus,.field select:focus{
+  border-color:var(--gold);
+  box-shadow:0 0 0 3px rgba(240,165,0,0.08);
+}
+.field input.error{border-color:var(--red)}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pw-wrap{position:relative}
+.pw-wrap input{padding-right:44px}
+.pw-toggle{
+  position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  background:none;border:none;color:var(--muted);cursor:pointer;
+  font-size:1.1rem;padding:4px;
+}
+.pw-strength{
+  display:flex;gap:4px;margin-top:5px;
+}
+.ps-bar{
+  flex:1;height:3px;border-radius:2px;
+  background:var(--border);transition:background 0.3s;
+}
+.ps-bar.weak{background:var(--red)}
+.ps-bar.fair{background:var(--gold)}
+.ps-bar.good{background:var(--blue)}
+.ps-bar.strong{background:var(--green)}
+.ps-text{font-size:0.65rem;color:var(--muted);margin-top:3px}
+
+/* SUBMIT */
+.auth-submit{
+  width:100%;padding:13px;margin-top:0.5rem;
+  background:var(--gold);color:#000;border:none;
+  border-radius:7px;font-family:'Barlow Condensed',sans-serif;
+  font-size:1rem;font-weight:700;letter-spacing:2px;
+  cursor:pointer;transition:all 0.2s;
+}
+.auth-submit:hover{background:#e09400;transform:translateY(-1px)}
+.auth-submit:disabled{background:var(--muted);cursor:not-allowed;transform:none}
+
+/* DIVIDER */
+.or-divider{
+  display:flex;align-items:center;gap:12px;
+  margin:1.2rem 0;color:var(--muted);font-size:0.75rem;
+}
+.or-divider::before,.or-divider::after{
+  content:'';flex:1;height:1px;background:var(--border);
+}
+
+/* SOCIAL BTNS */
+.social-btns{display:flex;gap:10px;margin-bottom:1.2rem}
+.social-btn{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:10px;border:1px solid var(--border);border-radius:7px;
+  background:transparent;color:var(--secondary);font-size:0.82rem;
+  cursor:pointer;transition:all 0.2s;
+}
+.social-btn:hover{border-color:var(--gold);color:var(--text)}
+.social-icon{font-size:1.2rem}
+
+/* TERMS */
+.terms-text{font-size:0.72rem;color:var(--muted);text-align:center;margin-top:1rem;line-height:1.5}
+.terms-text a{color:var(--gold);text-decoration:none}
+
+/* CHECKBOX */
+.check-field{display:flex;align-items:flex-start;gap:10px;margin-bottom:1rem}
+.check-field input[type=checkbox]{
+  width:16px;height:16px;margin-top:2px;flex-shrink:0;
+  accent-color:var(--gold);cursor:pointer;
+}
+.check-field label{font-size:0.78rem;color:var(--secondary);line-height:1.4;cursor:pointer}
+.check-field label a{color:var(--gold);text-decoration:none}
+
+/* ERROR / SUCCESS MESSAGES */
+.form-msg{
+  padding:10px 14px;border-radius:7px;
+  font-size:0.82rem;margin-bottom:1rem;display:none;
+}
+.form-msg.error{background:rgba(255,31,61,0.1);border:1px solid rgba(255,31,61,0.3);color:#ff6b80}
+.form-msg.success{background:rgba(0,217,126,0.1);border:1px solid rgba(0,217,126,0.3);color:var(--green)}
+
+/* FORGOT PW */
+.forgot-link{
+  float:right;font-size:0.72rem;color:var(--gold);
+  text-decoration:none;transition:opacity 0.2s;
+}
+.forgot-link:hover{opacity:0.8}
+
+/* FEATURES STRIP (below card) */
+.auth-features{
+  display:flex;justify-content:center;gap:2rem;
+  margin-top:1.5rem;flex-wrap:wrap;
+}
+.af-item{
+  display:flex;align-items:center;gap:6px;
+  font-size:0.72rem;color:var(--muted);
+}
+.af-icon{font-size:1rem}
+
+/* FOOTER */
+.auth-footer{
+  position:relative;z-index:1;
+  text-align:center;padding:1.2rem;
+  font-size:0.72rem;color:var(--muted);
+  border-top:1px solid var(--border);
+}
+
+/* USER DASHBOARD PANEL (shown after login) */
+.user-dashboard{
+  display:none;background:var(--card);
+  border:1px solid var(--border);border-radius:14px;
+  padding:2rem;position:relative;overflow:hidden;
+}
+.user-dashboard::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--gold),var(--green));
+}
+.ud-header{display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem}
+.ud-avatar{
+  width:64px;height:64px;border-radius:50%;
+  background:linear-gradient(135deg,var(--gold),#e85d04);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Oswald',sans-serif;font-weight:700;font-size:1.4rem;
+  color:#000;flex-shrink:0;
+}
+.ud-name{font-family:'Oswald',sans-serif;font-size:1.4rem;font-weight:700}
+.ud-email{font-size:0.78rem;color:var(--secondary);margin-top:2px}
+.ud-badge{
+  display:inline-block;background:rgba(240,165,0,0.12);
+  color:var(--gold);border:1px solid rgba(240,165,0,0.3);
+  font-size:0.65rem;padding:2px 8px;border-radius:20px;
+  font-family:'Space Mono',monospace;margin-top:5px;
+}
+.ud-stats{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:10px;margin-bottom:1.5rem;
+}
+.ud-stat{
+  background:#060f1f;border:1px solid var(--border);
+  border-radius:8px;padding:0.9rem;text-align:center;
+}
+.ud-stat-num{font-family:'Oswald',sans-serif;font-size:1.5rem;font-weight:700;color:var(--gold)}
+.ud-stat-label{font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+.ud-orders-title{
+  font-family:'Barlow Condensed',sans-serif;font-size:0.82rem;
+  font-weight:700;letter-spacing:2px;color:var(--secondary);
+  margin-bottom:0.75rem;
+}
+.ud-order-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;background:#060f1f;
+  border:1px solid var(--border);border-radius:8px;
+  margin-bottom:8px;
+}
+.ud-order-icon{font-size:1.4rem}
+.ud-order-info{flex:1}
+.ud-order-name{font-size:0.85rem;font-weight:600}
+.ud-order-meta{font-size:0.7rem;color:var(--muted);margin-top:2px}
+.ud-order-status{
+  font-family:'Space Mono',monospace;font-size:0.65rem;
+  padding:3px 8px;border-radius:3px;font-weight:700;
+}
+.ud-order-status.delivered{background:rgba(0,217,126,0.1);color:var(--green)}
+.ud-order-status.pending{background:rgba(240,165,0,0.1);color:var(--gold)}
+.ud-actions{display:flex;gap:8px;margin-top:1.5rem;flex-wrap:wrap}
+.ud-action-btn{
+  flex:1;padding:10px;text-align:center;
+  background:transparent;border:1px solid var(--border);
+  color:var(--secondary);border-radius:7px;
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:0.82rem;font-weight:700;letter-spacing:1px;
+  cursor:pointer;transition:all 0.2s;text-decoration:none;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.ud-action-btn:hover{border-color:var(--gold);color:var(--gold)}
+.ud-action-btn.primary-btn{background:var(--gold);color:#000;border-color:var(--gold)}
+.ud-action-btn.primary-btn:hover{background:#e09400}
+.ud-logout-btn{
+  width:100%;padding:11px;margin-top:1rem;
+  background:rgba(255,31,61,0.1);border:1px solid rgba(255,31,61,0.3);
+  color:#ff6b80;border-radius:7px;
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:0.88rem;font-weight:700;letter-spacing:1px;
+  cursor:pointer;transition:all 0.2s;
+}
+.ud-logout-btn:hover{background:rgba(255,31,61,0.2)}
+
+@media(max-width:500px){
+  .field-row{grid-template-columns:1fr}
+  .auth-card{padding:1.5rem}
+  .social-btns{flex-direction:column}
+}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+
+<!-- HEADER -->
+<header class="auth-header" style="justify-content:flex-end">
+  <a href="index.html" class="back-link">← Back to Portal</a>
+</header>
+
+<main class="auth-main">
+
+  <div class="auth-container">
+
+    <!-- TAB TOGGLE -->
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="showTab('login',this)">SIGN IN</button>
+      <button class="auth-tab" onclick="showTab('register',this)">CREATE ACCOUNT</button>
+    </div>
+
+    <!-- CARD -->
+    <div class="auth-card">
+
+      <!-- ===== LOGIN FORM ===== -->
+      <div class="auth-form active" id="form-login">
+        <div class="form-title">Welcome Back 🏏</div>
+        <div class="form-subtitle">Sign in to your IPL Portal account</div>
+
+        <div class="form-msg" id="login-msg"></div>
+
+        <div class="social-btns">
+          <button class="social-btn" onclick="socialLogin('google')"><span class="social-icon">🔵</span> Google</button>
+          <button class="social-btn" onclick="socialLogin('facebook')"><span class="social-icon">📘</span> Facebook</button>
+        </div>
+        <div class="or-divider">OR CONTINUE WITH EMAIL</div>
+
+        <div class="field">
+          <label>Email Address</label>
+          <input type="email" id="login-email" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div class="field">
+          <label>
+            Password
+            <a href="#" class="forgot-link" onclick="showForgotPw(event)">Forgot password?</a>
+          </label>
+          <div class="pw-wrap">
+            <input type="password" id="login-pw" placeholder="Enter your password" autocomplete="current-password">
+            <button class="pw-toggle" onclick="togglePw('login-pw',this)" type="button">👁️</button>
+          </div>
+        </div>
+        <div class="check-field">
+          <input type="checkbox" id="remember-me">
+          <label for="remember-me">Remember me for 30 days</label>
+        </div>
+        <button class="auth-submit" onclick="handleLogin()">SIGN IN →</button>
+        <div class="terms-text">New to IPL Portal? <a href="#" onclick="showTab('register',null);return false">Create a free account</a></div>
+      </div>
+
+      <!-- ===== REGISTER FORM ===== -->
+      <div class="auth-form" id="form-register">
+        <div class="form-title">Join IPL Portal 🏆</div>
+        <div class="form-subtitle">Create your account to book tickets, buy jerseys & more</div>
+
+        <div class="form-msg" id="reg-msg"></div>
+
+        <div class="social-btns">
+          <button class="social-btn" onclick="socialLogin('google')"><span class="social-icon">🔵</span> Google</button>
+          <button class="social-btn" onclick="socialLogin('facebook')"><span class="social-icon">📘</span> Facebook</button>
+        </div>
+        <div class="or-divider">OR REGISTER WITH EMAIL</div>
+
+        <div class="field-row">
+          <div class="field">
+            <label>First Name *</label>
+            <input type="text" id="reg-fname" placeholder="Rahul" autocomplete="given-name">
+          </div>
+          <div class="field">
+            <label>Last Name *</label>
+            <input type="text" id="reg-lname" placeholder="Sharma" autocomplete="family-name">
+          </div>
+        </div>
+        <div class="field">
+          <label>Email Address *</label>
+          <input type="email" id="reg-email" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div class="field">
+          <label>Phone Number</label>
+          <input type="tel" id="reg-phone" placeholder="+91 98765 43210" autocomplete="tel">
+        </div>
+        <div class="field">
+          <label>Favourite IPL Team</label>
+          <select id="reg-team">
+            <option value="">— Select your team —</option>
+            <option>Mumbai Indians (MI)</option>
+            <option>Chennai Super Kings (CSK)</option>
+            <option>Royal Challengers Bengaluru (RCB)</option>
+            <option>Kolkata Knight Riders (KKR)</option>
+            <option>Delhi Capitals (DC)</option>
+            <option>Punjab Kings (PBKS)</option>
+            <option>Rajasthan Royals (RR)</option>
+            <option>Sunrisers Hyderabad (SRH)</option>
+            <option>Gujarat Titans (GT)</option>
+            <option>Lucknow Super Giants (LSG)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Password *</label>
+          <div class="pw-wrap">
+            <input type="password" id="reg-pw" placeholder="Create a strong password" oninput="checkPwStrength(this.value)" autocomplete="new-password">
+            <button class="pw-toggle" onclick="togglePw('reg-pw',this)" type="button">👁️</button>
+          </div>
+          <div class="pw-strength">
+            <div class="ps-bar" id="ps1"></div>
+            <div class="ps-bar" id="ps2"></div>
+            <div class="ps-bar" id="ps3"></div>
+            <div class="ps-bar" id="ps4"></div>
+          </div>
+          <div class="ps-text" id="ps-text">Enter password</div>
+        </div>
+        <div class="field">
+          <label>Confirm Password *</label>
+          <div class="pw-wrap">
+            <input type="password" id="reg-pw2" placeholder="Repeat your password" autocomplete="new-password">
+            <button class="pw-toggle" onclick="togglePw('reg-pw2',this)" type="button">👁️</button>
+          </div>
+        </div>
+        <div class="check-field">
+          <input type="checkbox" id="agree-terms">
+          <label for="agree-terms">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></label>
+        </div>
+        <div class="check-field">
+          <input type="checkbox" id="agree-offers" checked>
+          <label for="agree-offers">Send me IPL offers, match reminders and exclusive deals via email</label>
+        </div>
+        <button class="auth-submit" onclick="handleRegister()">CREATE ACCOUNT →</button>
+        <div class="terms-text">Already have an account? <a href="#" onclick="showTab('login',null);return false">Sign in here</a></div>
+      </div>
+
+      <!-- ===== USER DASHBOARD (shown after login) ===== -->
+      <div class="user-dashboard" id="user-dashboard">
+        <div class="ud-header">
+          <div class="ud-avatar" id="ud-avatar">VK</div>
+          <div>
+            <div class="ud-name" id="ud-name">Virat Kohli</div>
+            <div class="ud-email" id="ud-email">virat@example.com</div>
+            <span class="ud-badge">🏆 IPL FAN MEMBER</span>
+          </div>
+        </div>
+        <div class="ud-stats">
+          <div class="ud-stat">
+            <div class="ud-stat-num" id="ud-orders-count">0</div>
+            <div class="ud-stat-label">Orders</div>
+          </div>
+          <div class="ud-stat">
+            <div class="ud-stat-num" id="ud-tickets-count">0</div>
+            <div class="ud-stat-label">Tickets</div>
+          </div>
+          <div class="ud-stat">
+            <div class="ud-stat-num" id="ud-team">RCB</div>
+            <div class="ud-stat-label">My Team</div>
+          </div>
+        </div>
+        <div class="ud-orders-title">RECENT ORDERS</div>
+        <div id="ud-orders-list">
+          <div class="ud-order-item">
+            <span class="ud-order-icon">📦</span>
+            <div class="ud-order-info">
+              <div class="ud-order-name">No orders yet</div>
+              <div class="ud-order-meta">Shop jerseys, tickets or merchandise</div>
+            </div>
+          </div>
+        </div>
+        <div class="ud-actions">
+          <a href="index.html" class="ud-action-btn primary-btn">🏠 Go to Portal</a>
+          <a href="index.html#tickets" class="ud-action-btn" onclick="sessionStorage.setItem('goto','tickets')">🎟️ Book Tickets</a>
+          <button class="ud-action-btn" onclick="showEditProfile()">✏️ Edit Profile</button>
+        </div>
+        <button class="ud-logout-btn" onclick="handleLogout()">🚪 SIGN OUT</button>
+      </div>
+
+      <!-- FORGOT PASSWORD PANEL -->
+      <div class="auth-form" id="form-forgot">
+        <div class="form-title">Reset Password 🔑</div>
+        <div class="form-subtitle">Enter your email and we'll send a reset link</div>
+        <div class="form-msg" id="forgot-msg"></div>
+        <div class="field">
+          <label>Email Address</label>
+          <input type="email" id="forgot-email" placeholder="you@example.com">
+        </div>
+        <button class="auth-submit" onclick="handleForgot()">SEND RESET LINK →</button>
+        <div class="terms-text" style="margin-top:1rem"><a href="#" onclick="showTab('login',null);return false">← Back to Sign In</a></div>
+      </div>
+
+    </div><!-- end auth-card -->
+
+    <!-- FEATURES STRIP -->
+    <div class="auth-features">
+      <div class="af-item"><span class="af-icon">🔒</span>Secure Login</div>
+      <div class="af-item"><span class="af-icon">🎟️</span>Manage Bookings</div>
+      <div class="af-item"><span class="af-icon">📦</span>Track Orders</div>
+      <div class="af-item"><span class="af-icon">🎁</span>Exclusive Offers</div>
+    </div>
+
+  </div><!-- end auth-container -->
+</main>
+
+<footer class="auth-footer">
+  🏏 Cricket Hub · IPL 2026 Official Portal · BCCI Licensed · Secure SSL
+</footer>
+
+<script>
+// ================================================================
+// AUTH PAGE — USER DATABASE (localStorage based)
+// ================================================================
+
+const DB_KEY = 'ipl_users_db';
+const SESSION_KEY = 'ipl_current_user';
+
+// Utility: get/set user database
+function getDB() {
+  try { return JSON.parse(localStorage.getItem(DB_KEY) || '[]'); } catch(e) { return []; }
+}
+function setDB(users) { localStorage.setItem(DB_KEY, JSON.stringify(users)); }
+function getCurrentUser() {
+  try { return JSON.parse(sessionStorage.getItem(SESSION_KEY) || localStorage.getItem(SESSION_KEY+'_remember') || 'null'); } catch(e) { return null; }
+}
+function setCurrentUser(user, remember) {
+  sessionStorage.setItem(SESSION_KEY, JSON.stringify(user));
+  if (remember) localStorage.setItem(SESSION_KEY+'_remember', JSON.stringify(user));
+}
+function clearCurrentUser() {
+  sessionStorage.removeItem(SESSION_KEY);
+  localStorage.removeItem(SESSION_KEY+'_remember');
+}
+
+// ===== TAB SWITCHING =====
+function showTab(tab, btn) {
+  document.querySelectorAll('.auth-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+  document.getElementById('user-dashboard').style.display = 'none';
+  if (btn) btn.classList.add('active');
+  else {
+    const tabs = document.querySelectorAll('.auth-tab');
+    if (tab === 'login') tabs[0].classList.add('active');
+    if (tab === 'register') tabs[1].classList.add('active');
+  }
+  const el = document.getElementById('form-' + tab);
+  if (el) el.classList.add('active');
+}
+
+// ===== PASSWORD TOGGLE =====
+function togglePw(id, btn) {
+  const inp = document.getElementById(id);
+  if (!inp) return;
+  if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
+  else { inp.type = 'password'; btn.textContent = '👁️'; }
+}
+
+// ===== PASSWORD STRENGTH =====
+function checkPwStrength(pw) {
+  let score = 0;
+  if (pw.length >= 8) score++;
+  if (/[A-Z]/.test(pw)) score++;
+  if (/[0-9]/.test(pw)) score++;
+  if (/[^A-Za-z0-9]/.test(pw)) score++;
+  const labels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
+  const classes = ['', 'weak', 'fair', 'good', 'strong'];
+  for (let i = 1; i <= 4; i++) {
+    const bar = document.getElementById('ps' + i);
+    if (bar) { bar.className = 'ps-bar'; if (i <= score) bar.classList.add(classes[score]); }
+  }
+  const txt = document.getElementById('ps-text');
+  if (txt) txt.textContent = pw ? labels[score] || 'Weak' : 'Enter password';
+}
+
+// ===== SHOW MESSAGE =====
+function showMsg(id, msg, type) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = msg;
+  el.className = 'form-msg ' + type;
+  el.style.display = 'block';
+  setTimeout(() => { el.style.display = 'none'; }, 5000);
+}
+
+// ===== VALIDATE EMAIL =====
+function isEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+
+// ===== REGISTER =====
+function handleRegister() {
+  const fname = document.getElementById('reg-fname').value.trim();
+  const lname = document.getElementById('reg-lname').value.trim();
+  const email = document.getElementById('reg-email').value.trim().toLowerCase();
+  const phone = document.getElementById('reg-phone').value.trim();
+  const team  = document.getElementById('reg-team').value;
+  const pw    = document.getElementById('reg-pw').value;
+  const pw2   = document.getElementById('reg-pw2').value;
+  const terms = document.getElementById('agree-terms').checked;
+  const offers= document.getElementById('agree-offers').checked;
+
+  if (!fname || !lname) return showMsg('reg-msg', '⚠️ Please enter your first and last name.', 'error');
+  if (!isEmail(email))  return showMsg('reg-msg', '⚠️ Please enter a valid email address.', 'error');
+  if (pw.length < 6)    return showMsg('reg-msg', '⚠️ Password must be at least 6 characters.', 'error');
+  if (pw !== pw2)       return showMsg('reg-msg', '⚠️ Passwords do not match.', 'error');
+  if (!terms)           return showMsg('reg-msg', '⚠️ Please agree to Terms & Privacy Policy.', 'error');
+
+  const db = getDB();
+  if (db.find(u => u.email === email)) {
+    return showMsg('reg-msg', '⚠️ An account with this email already exists. Please sign in.', 'error');
+  }
+
+  const newUser = {
+    id: 'usr_' + Date.now(),
+    fname, lname, email, phone, team, offers,
+    password: btoa(pw), // base64 encode (demo only — not real security)
+    createdAt: new Date().toISOString(),
+    orders: [], tickets: [], totalSpent: 0,
+  };
+  db.push(newUser);
+  setDB(db);
+  setCurrentUser(newUser, false);
+  // Track registration in login log
+  try {
+    const log = JSON.parse(localStorage.getItem('ipl_login_log') || '[]');
+    log.push({ userId: newUser.id, name: `${newUser.fname} ${newUser.lname}`, email: newUser.email,
+      time: new Date().toISOString(), type: 'register' });
+    localStorage.setItem('ipl_login_log', JSON.stringify(log));
+  } catch(e) {}
+  showMsg('reg-msg', '✅ Account created! Taking you to the portal...', 'success');
+  setTimeout(() => { window.location.replace('index.html'); }, 1000);
+}
+
+// ===== LOGIN =====
+function handleLogin() {
+  const email = document.getElementById('login-email').value.trim().toLowerCase();
+  const pw    = document.getElementById('login-pw').value;
+  const remember = document.getElementById('remember-me').checked;
+
+  if (!isEmail(email)) return showMsg('login-msg', '⚠️ Please enter a valid email address.', 'error');
+  if (!pw)             return showMsg('login-msg', '⚠️ Please enter your password.', 'error');
+
+  const db = getDB();
+  const user = db.find(u => u.email === email && u.password === btoa(pw));
+  if (!user) {
+    if (email === 'demo@ipl.com' && pw === 'demo123') {
+      const demoUser = { id:'demo', fname:'Demo', lname:'Fan', email:'demo@ipl.com',
+        team:'Royal Challengers Bengaluru (RCB)', orders:[], tickets:[], totalSpent:0,
+        createdAt: new Date().toISOString(), loginCount:1, lastLogin:new Date().toISOString() };
+      setCurrentUser(demoUser, remember);
+      trackLogin(demoUser);
+      showMsg('login-msg', `✅ Welcome, Demo Fan! Taking you to the portal...`, 'success');
+      setTimeout(() => { window.location.replace('index.html'); }, 800);
+      return;
+    }
+    return showMsg('login-msg', '❌ Invalid email or password. Try demo@ipl.com / demo123', 'error');
+  }
+  // Update login stats on user record
+  user.loginCount = (user.loginCount||0) + 1;
+  user.lastLogin  = new Date().toISOString();
+  const idx = db.findIndex(u => u.email === email);
+  if (idx >= 0) { db[idx] = user; setDB(db); }
+  setCurrentUser(user, remember);
+  trackLogin(user);
+  showMsg('login-msg', `✅ Welcome back, ${user.fname}! Taking you to the portal...`, 'success');
+  setTimeout(() => { window.location.replace('index.html'); }, 800);
+}
+
+// Track every login in a separate log
+function trackLogin(user) {
+  try {
+    const log = JSON.parse(localStorage.getItem('ipl_login_log') || '[]');
+    log.push({ userId: user.id, name: `${user.fname} ${user.lname}`, email: user.email,
+      time: new Date().toISOString(), type: 'login' });
+    // Keep last 500 entries
+    if (log.length > 500) log.splice(0, log.length - 500);
+    localStorage.setItem('ipl_login_log', JSON.stringify(log));
+  } catch(e) {}
+}
+
+// ===== SHOW USER DASHBOARD =====
+function showUserDashboard(user) {
+  document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+  document.querySelectorAll('.auth-tab').forEach(b => b.classList.remove('active'));
+  const dash = document.getElementById('user-dashboard');
+  dash.style.display = 'block';
+
+  const initials = ((user.fname||'?')[0] + (user.lname||'?')[0]).toUpperCase();
+  document.getElementById('ud-avatar').textContent = initials;
+  document.getElementById('ud-name').textContent = `${user.fname} ${user.lname}`;
+  document.getElementById('ud-email').textContent = user.email;
+  document.getElementById('ud-orders-count').textContent = (user.orders||[]).length;
+  document.getElementById('ud-tickets-count').textContent = (user.tickets||[]).length;
+  const teamShort = (user.team||'').match(/\(([^)]+)\)/);
+  document.getElementById('ud-team').textContent = teamShort ? teamShort[1] : '—';
+
+  // Render orders
+  const ordersList = document.getElementById('ud-orders-list');
+  if ((user.orders||[]).length === 0 && (user.tickets||[]).length === 0) {
+    ordersList.innerHTML = `<div class="ud-order-item"><span class="ud-order-icon">📦</span><div class="ud-order-info"><div class="ud-order-name">No orders yet</div><div class="ud-order-meta">Shop jerseys, tickets or merchandise</div></div></div>`;
+  } else {
+    const all = [...(user.orders||[]), ...(user.tickets||[])].slice(-5).reverse();
+    ordersList.innerHTML = all.map(o => `
+      <div class="ud-order-item">
+        <span class="ud-order-icon">${o.emoji||'📦'}</span>
+        <div class="ud-order-info">
+          <div class="ud-order-name">${o.name}</div>
+          <div class="ud-order-meta">${o.date} · ₹${o.amount?.toLocaleString()||0}</div>
+        </div>
+        <span class="ud-order-status ${o.status==='Delivered'?'delivered':'pending'}">${o.status||'Processing'}</span>
+      </div>`).join('');
+  }
+}
+
+// ===== LOGOUT =====
+function handleLogout() {
+  clearCurrentUser();
+  document.getElementById('user-dashboard').style.display = 'none';
+  showTab('login', document.querySelectorAll('.auth-tab')[0]);
+  showMsg('login-msg', '✅ Signed out successfully.', 'success');
+}
+
+// ===== FORGOT PASSWORD =====
+function showForgotPw(e) {
+  e.preventDefault();
+  document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+  document.getElementById('form-forgot').classList.add('active');
+}
+function handleForgot() {
+  const email = document.getElementById('forgot-email').value.trim();
+  if (!isEmail(email)) return showMsg('forgot-msg', '⚠️ Enter a valid email address.', 'error');
+  showMsg('forgot-msg', `✅ Reset link sent to ${email} (demo — check your email)`, 'success');
+}
+
+// ===== SOCIAL LOGIN (demo) =====
+function socialLogin(provider) {
+  const names = { google:['Google','Fan'], facebook:['Facebook','Fan'] };
+  const [fn, ln] = names[provider] || ['Social','Fan'];
+  const demoUser = {
+    id: provider + '_' + Date.now(), fname:fn, lname:ln,
+    email: `${provider}@demo.com`, team:'Mumbai Indians (MI)',
+    orders:[], tickets:[], totalSpent:0, createdAt: new Date().toISOString()
+  };
+  setCurrentUser(demoUser, false);
+  window.location.replace('index.html');
+}
+
+// ===== EDIT PROFILE (demo popup) =====
+function showEditProfile() {
+  const user = getCurrentUser();
+  if (!user) return;
+  const newPhone = prompt('Update phone number:', user.phone||'');
+  if (newPhone !== null) {
+    user.phone = newPhone;
+    setCurrentUser(user, false);
+    alert('Profile updated successfully!');
+  }
+}
+
+// ===== AUTO LOGIN CHECK =====
+window.addEventListener('DOMContentLoaded', () => {
+  const user = getCurrentUser();
+  if (user) {
+    // Already logged in — go straight to portal
+    window.location.replace('index.html');
+  }
+});
+</script>
+</body>
+</html>

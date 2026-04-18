@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cricket Hub — Verify Booking</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#03070d;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;padding:16px}
+.wrap{max-width:480px;margin:0 auto}
+.header{background:linear-gradient(135deg,#0a1628,#0f2244);border:1.5px solid rgba(240,165,0,0.35);border-radius:18px;padding:24px 20px;text-align:center;margin-bottom:18px}
+.logo{font-size:2.4rem;margin-bottom:8px}
+.brand{font-size:1.5rem;font-weight:800;color:#f0a500;letter-spacing:2px;font-family:'Oswald',sans-serif}
+.sub{font-size:0.72rem;color:#64748b;letter-spacing:3px;margin-top:4px}
+.badge{display:inline-flex;align-items:center;gap:6px;background:#22c55e18;border:1.5px solid #22c55e55;color:#4ade80;border-radius:24px;padding:6px 16px;font-size:0.78rem;font-weight:700;letter-spacing:1px;margin:14px 0}
+.ref-box{background:#f0a50010;border:1.5px solid #f0a50044;border-radius:10px;padding:10px 16px;font-family:'Courier New',monospace;font-size:0.92rem;font-weight:700;color:#f0a500;word-break:break-all;text-align:center;margin-bottom:18px}
+.user-box{background:#0ea5e910;border:1px solid #0ea5e933;border-radius:10px;padding:10px 14px;font-size:0.82rem;color:#7dd3fc;text-align:center;margin-bottom:14px;display:flex;align-items:center;justify-content:center;gap:8px}
+.card{background:#060f1e;border:1px solid #1e3a5f;border-radius:14px;overflow:hidden;margin-bottom:14px}
+.card-title{background:#0a1628;padding:10px 16px;font-size:0.7rem;font-weight:700;letter-spacing:2px;color:rgba(240,165,0,0.8);border-bottom:1px solid #1e3a5f;display:flex;align-items:center;gap:6px}
+.row{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:1px solid #0d1e35;gap:10px}
+.row:last-child{border-bottom:none}
+.row-label{font-size:0.72rem;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;flex-shrink:0}
+.row-val{font-size:0.82rem;color:#e2e8f0;text-align:right;word-break:break-word;max-width:65%}
+.row-val.gold{color:#f0a500;font-weight:700;font-family:'Courier New',monospace}
+.row-val.green{color:#4ade80;font-weight:700}
+.footer{text-align:center;padding:16px;font-size:0.72rem;color:#334155;line-height:1.8;background:#060f1e;border-radius:12px;border:1px solid #1e3a5f}
+.not-found{text-align:center;padding:40px 20px;background:#060f1e;border:1px solid #1e3a5f;border-radius:14px}
+.not-found .icon{font-size:3rem;margin-bottom:12px}
+.not-found p{color:#64748b;font-size:0.85rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <div class="logo">🏏</div>
+    <div class="brand">Cricket Hub</div>
+    <div class="sub">TATA IPL 2026 · OFFICIAL PORTAL</div>
+  </div>
+  <div id="content"><p style="text-align:center;color:#64748b;padding:40px">Loading...</p></div>
+</div>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const id = params.get('id');
+const content = document.getElementById('content');
+
+if (!id) {
+  content.innerHTML = `<div class="not-found"><div class="icon">❌</div><p>No booking ID provided.</p></div>`;
+} else {
+  // Try to read from localStorage (set by portal when booking is confirmed)
+  let data = null;
+  try { data = JSON.parse(localStorage.getItem('ch_booking_' + id)); } catch(e) {}
+
+  if (!data) {
+    content.innerHTML = `
+      <div class="not-found">
+        <div class="icon">🔍</div>
+        <p style="color:#f0a500;font-weight:700;font-size:1rem;margin-bottom:8px">Booking: ${id}</p>
+        <p>Open this link on the same device where the booking was made to see full details.</p>
+      </div>`;
+  } else {
+    const isTicket = data.type === 'ticket';
+    const title = isTicket ? '🎟️ MATCH TICKET' : data.type === 'jersey' ? '👕 JERSEY ORDER' : '🛍️ MERCHANDISE ORDER';
+
+    const rowsHTML = data.rows.map(([label, val, gold]) =>
+      `<div class="row"><span class="row-label">${label}</span><span class="row-val${gold?' gold':''}">${val}</span></div>`
+    ).join('');
+
+    content.innerHTML = `
+      <div class="badge">✓ VERIFIED BOOKING</div>
+      ${data.userName ? `<div class="user-box"><span>👤</span><span>${data.userName}</span></div>` : ''}
+      <div class="ref-box">${id}</div>
+      <div class="card">
+        <div class="card-title">${title}</div>
+        ${rowsHTML}
+      </div>
+      <div class="footer">
+        🏏 Cricket Hub · Tata IPL 2026 · BCCI Licensed<br>
+        ${isTicket ? '📱 Show this page at stadium entry · 🆔 Carry Govt Photo ID' : '📱 Show this page to delivery person · 🚚 3–5 business days'}
+      </div>`;
+  }
+}
+</script>
+</body>
+</html>

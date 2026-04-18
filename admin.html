@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IPL Portal — User Database Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Space+Mono:wght@400;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#03070d;--card:#0a1628;--border:rgba(100,150,220,0.15);--gold:#f0a500;--green:#00d97e;--red:#ff1f3d;--text:#f0f4ff;--muted:#64748b;--secondary:#8ba3c7}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;min-height:100vh;padding:2rem}
+h1{font-family:'Oswald',sans-serif;font-size:2rem;font-weight:700;letter-spacing:2px;margin-bottom:0.25rem}
+.subtitle{color:var(--secondary);font-size:0.85rem;margin-bottom:2rem}
+.header-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem}
+.back-btn{color:var(--gold);text-decoration:none;font-size:0.82rem;border:1px solid rgba(240,165,0,0.3);padding:6px 14px;border-radius:5px}
+.stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1rem;margin-bottom:2rem}
+.stat-box{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.2rem;text-align:center}
+.stat-num{font-family:'Oswald',sans-serif;font-size:2rem;font-weight:700;color:var(--gold)}
+.stat-label{font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+.table-card{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.table-header{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.5rem;border-bottom:1px solid var(--border)}
+.table-header h2{font-family:'Oswald',sans-serif;font-size:1.1rem;letter-spacing:1px}
+.search-input{background:#060f1f;border:1px solid var(--border);color:var(--text);padding:7px 12px;border-radius:5px;font-size:0.82rem;outline:none;width:220px}
+.search-input:focus{border-color:var(--gold)}
+table{width:100%;border-collapse:collapse;font-size:0.82rem}
+th{background:#060f1f;padding:10px 14px;text-align:left;font-family:'Oswald',sans-serif;font-size:0.72rem;font-weight:600;letter-spacing:1.5px;color:var(--secondary);white-space:nowrap}
+td{padding:10px 14px;border-bottom:1px solid rgba(100,150,220,0.05);vertical-align:middle}
+tr:hover td{background:rgba(240,165,0,0.02)}
+tr:last-child td{border-bottom:none}
+.avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#e85d04);display:flex;align-items:center;justify-content:center;font-family:'Oswald',sans-serif;font-weight:700;font-size:0.75rem;color:#000}
+.user-cell{display:flex;align-items:center;gap:10px}
+.user-name{font-weight:600}
+.user-email{font-size:0.7rem;color:var(--muted)}
+.team-badge{background:rgba(240,165,0,0.08);color:var(--gold);border:1px solid rgba(240,165,0,0.2);font-size:0.65rem;padding:2px 7px;border-radius:3px;font-family:'Space Mono',monospace}
+.status-active{color:var(--green);font-size:0.72rem}
+.mono{font-family:'Space Mono',monospace;font-size:0.75rem}
+.del-btn{background:rgba(255,31,61,0.1);border:1px solid rgba(255,31,61,0.2);color:#ff6b80;padding:4px 10px;border-radius:4px;font-size:0.7rem;cursor:pointer;transition:all 0.2s}
+.del-btn:hover{background:rgba(255,31,61,0.25)}
+.empty-state{text-align:center;padding:3rem;color:var(--muted)}
+.empty-icon{font-size:3rem;margin-bottom:0.75rem}
+.demo-note{background:rgba(14,165,233,0.08);border:1px solid rgba(14,165,233,0.2);border-radius:8px;padding:1rem 1.5rem;margin-bottom:1.5rem;font-size:0.82rem;color:var(--secondary)}
+.demo-note b{color:var(--text)}
+.export-btn{background:transparent;border:1px solid var(--border);color:var(--secondary);padding:6px 14px;border-radius:5px;font-size:0.78rem;cursor:pointer;transition:all 0.2s}
+.export-btn:hover{border-color:var(--gold);color:var(--gold)}
+</style>
+</head>
+<body>
+<div class="header-row">
+  <div>
+    <h1>🗄️ USER DATABASE</h1>
+    <div class="subtitle">IPL Cricket Portal 2025 — Registered Users</div>
+  </div>
+  <div style="display:flex;gap:10px;align-items:center">
+    <button class="export-btn" onclick="exportCSV()">📥 Export CSV</button>
+    <button class="export-btn" onclick="clearAll()">🗑️ Clear All</button>
+    <a href="index.html" class="back-btn">← Portal</a>
+    <a href="auth.html" class="back-btn">🔐 Login Page</a>
+  </div>
+</div>
+
+<div class="demo-note">
+  <b>ℹ️ Demo Database</b> — All data is stored in browser <b>localStorage</b>. In a real app, this would be a secure server-side database (PostgreSQL, MongoDB, etc.).<br>
+  Try creating accounts on the <a href="auth.html" style="color:var(--gold)">Login page</a>, then refresh this page to see them. Demo account: <b>demo@ipl.com</b> / <b>demo123</b>
+</div>
+
+<!-- STATS -->
+<div class="stats-row" id="stats-row"></div>
+
+<!-- USER TABLE -->
+<div class="table-card">
+  <div class="table-header">
+    <h2>REGISTERED USERS</h2>
+    <input type="text" class="search-input" id="search" placeholder="🔍 Search users..." oninput="filterUsers()">
+  </div>
+  <div style="overflow-x:auto">
+    <table id="users-table">
+      <thead>
+        <tr>
+          <th>#</th><th>USER</th><th>PHONE</th><th>TEAM</th>
+          <th>ORDERS</th><th>TICKETS</th><th>JOINED</th><th>STATUS</th><th>ACTION</th>
+        </tr>
+      </thead>
+      <tbody id="users-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+const DB_KEY = 'ipl_users_db';
+let allUsers = [];
+
+function loadUsers() {
+  try { allUsers = JSON.parse(localStorage.getItem(DB_KEY) || '[]'); } catch(e) { allUsers = []; }
+  renderStats();
+  renderTable(allUsers);
+}
+
+function renderStats() {
+  const el = document.getElementById('stats-row');
+  const teamCounts = {};
+  allUsers.forEach(u => { const t = (u.team||'').match(/\(([^)]+)\)/); if(t) teamCounts[t[1]] = (teamCounts[t[1]]||0)+1; });
+  const topTeam = Object.entries(teamCounts).sort((a,b)=>b[1]-a[1])[0];
+  el.innerHTML = `
+    <div class="stat-box"><div class="stat-num">${allUsers.length}</div><div class="stat-label">Total Users</div></div>
+    <div class="stat-box"><div class="stat-num">${allUsers.reduce((s,u)=>(u.orders||[]).length+s,0)}</div><div class="stat-label">Total Orders</div></div>
+    <div class="stat-box"><div class="stat-num">${allUsers.reduce((s,u)=>(u.tickets||[]).length+s,0)}</div><div class="stat-label">Total Tickets</div></div>
+    <div class="stat-box"><div class="stat-num" style="font-size:1.3rem">${topTeam?topTeam[0]:'—'}</div><div class="stat-label">Most Popular Team</div></div>
+  `;
+}
+
+function renderTable(users) {
+  const tbody = document.getElementById('users-tbody');
+  if (!users.length) {
+    tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><div class="empty-icon">👤</div><div>No users registered yet</div><div style="font-size:0.78rem;margin-top:0.5rem"><a href="auth.html" style="color:var(--gold)">Create the first account →</a></div></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = users.map((u, i) => {
+    const initials = ((u.fname||'?')[0] + (u.lname||'?')[0]).toUpperCase();
+    const team = (u.team||'').match(/\(([^)]+)\)/);
+    const joined = u.createdAt ? new Date(u.createdAt).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '—';
+    return `
+      <tr>
+        <td class="mono">${i+1}</td>
+        <td>
+          <div class="user-cell">
+            <div class="avatar">${initials}</div>
+            <div>
+              <div class="user-name">${u.fname} ${u.lname}</div>
+              <div class="user-email">${u.email}</div>
+            </div>
+          </div>
+        </td>
+        <td class="mono">${u.phone||'—'}</td>
+        <td>${team?`<span class="team-badge">${team[1]}</span>`:'—'}</td>
+        <td class="mono" style="text-align:center">${(u.orders||[]).length}</td>
+        <td class="mono" style="text-align:center">${(u.tickets||[]).length}</td>
+        <td class="mono">${joined}</td>
+        <td><span class="status-active">● Active</span></td>
+        <td><button class="del-btn" onclick="deleteUser('${u.id}')">🗑️ Delete</button></td>
+      </tr>`;
+  }).join('');
+}
+
+function filterUsers() {
+  const q = (document.getElementById('search').value || '').toLowerCase();
+  const filtered = q ? allUsers.filter(u =>
+    `${u.fname} ${u.lname} ${u.email} ${u.phone||''} ${u.team||''}`.toLowerCase().includes(q)
+  ) : allUsers;
+  renderTable(filtered);
+}
+
+function deleteUser(id) {
+  if (!confirm('Delete this user? This cannot be undone.')) return;
+  allUsers = allUsers.filter(u => u.id !== id);
+  localStorage.setItem(DB_KEY, JSON.stringify(allUsers));
+  loadUsers();
+}
+
+function clearAll() {
+  if (!confirm('Delete ALL users? This cannot be undone.')) return;
+  localStorage.removeItem(DB_KEY);
+  loadUsers();
+}
+
+function exportCSV() {
+  if (!allUsers.length) { alert('No users to export.'); return; }
+  const headers = ['ID','First Name','Last Name','Email','Phone','Team','Orders','Tickets','Joined'];
+  const rows = allUsers.map(u => [
+    u.id, u.fname, u.lname, u.email, u.phone||'',
+    (u.team||'').replace(/,/g,''), (u.orders||[]).length, (u.tickets||[]).length,
+    u.createdAt ? new Date(u.createdAt).toLocaleDateString() : ''
+  ]);
+  const csv = [headers, ...rows].map(r => r.map(v => `"${v}"`).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'ipl_users_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+}
+
+loadUsers();
+</script>
+</body>
+</html>

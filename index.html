@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🏏 Cricket Hub — IPL 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Barlow+Condensed:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="css/main.css">
+<link rel="stylesheet" href="css/portal.css">
+<!-- LOGIN GATE -->
+<script>
+(function(){
+  try{
+    const u=JSON.parse(sessionStorage.getItem('ipl_current_user')||localStorage.getItem('ipl_current_user_remember')||'null');
+    if(!u){window.location.replace('auth.html');}
+  }catch(e){window.location.replace('auth.html');}
+})();
+</script>
+</head>
+<body>
+<canvas id="particles-canvas"></canvas>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar" id="navbar">
+  <div class="nav-brand">
+    <div class="brand-icon">🏏</div>
+    <div class="brand-text">
+      <span class="brand-main">Cricket Hub</span>
+      <span class="brand-sub">IPL 2026 OFFICIAL PORTAL</span>
+    </div>
+  </div>
+  <div class="nav-center">
+    <button class="nav-tab active" data-section="portal"  onclick="switchSection('portal',this)">🏠 HOME</button>
+    <button class="nav-tab" data-section="tickets" onclick="switchSection('tickets',this)">🎟️ BOOK TICKETS</button>
+    <button class="nav-tab" data-section="jerseys" onclick="switchSection('jerseys',this)">👕 BUY JERSEYS</button>
+    <button class="nav-tab" data-section="merch"   onclick="switchSection('merch',this)">🛍️ MERCHANDISE</button>
+    <button class="nav-tab" data-section="players" onclick="switchSection('players',this)">👤 PLAYERS</button>
+    <button class="nav-tab" data-section="stats"   onclick="switchSection('stats',this)">📊 STATISTICS</button>
+    <button class="nav-tab" data-section="compare" onclick="switchSection('compare',this)">⚖️ COMPARE</button>
+    <button class="nav-tab" data-section="users"   onclick="switchSection('users',this)">🗄️ USER DB</button>
+  </div>
+  <div class="nav-right">
+    <button class="cart-btn" onclick="openCart()">🛒 <span class="cart-badge" id="cart-count">0</span></button>
+    <!-- USER PILL — click to open My Account -->
+    <div class="user-nav-pill" id="user-nav-pill" style="display:none" onclick="switchSection('myaccount',document.querySelector('[data-section=myaccount]'))" title="My Account">
+      <span class="unp-avatar" id="unp-avatar">?</span>
+      <span class="unp-name"   id="unp-name">User</span>
+    </div>
+    <button class="hamburger" onclick="toggleMenu()">☰</button>
+  </div>
+</nav>
+
+<!-- TICKER -->
+<div class="ticker-bar">
+  <div class="ticker-label">🏆 IPL 2026</div>
+  <div class="ticker-track">
+    <div class="ticker-content" id="ticker-content">
+      🎟️ Match-day tickets now available — Book early for best seats &nbsp;·&nbsp;
+      👕 RR, GT, MI, CSK new season jerseys in stock &nbsp;·&nbsp;
+      🏆 IPL 2026 Season is LIVE — RR leads points table &nbsp;·&nbsp;
+      ⭐ Virat Kohli signed bat — Limited edition available now &nbsp;·&nbsp;
+      🎁 Free shipping on orders above ₹999 &nbsp;·&nbsp;
+      📦 Official BCCI licensed merchandise only
+    </div>
+  </div>
+</div>
+
+<main class="main">
+
+<!-- ══════ HOME ══════ -->
+<section class="section active" id="sec-portal">
+  <div class="portal-hero">
+    <div class="portal-hero-bg"></div>
+    <div class="portal-hero-content">
+      <div class="portal-hero-eyebrow">🏆 CRICKET HUB · TATA IPL 2026 — SEASON 19</div>
+      <h1 class="portal-hero-title">YOUR COMPLETE<br><span class="title-accent">IPL EXPERIENCE</span></h1>
+      <p class="portal-hero-desc">Book match tickets · Buy official jerseys · Shop merchandise · Explore player stats — all in one place</p>
+      <div class="portal-hero-ctas">
+        <button class="cta-btn primary"      onclick="switchSection('tickets',document.querySelector('[data-section=tickets]'))">🎟️ BOOK TICKETS</button>
+        <button class="cta-btn accent-green" onclick="switchSection('jerseys',document.querySelector('[data-section=jerseys]'))">👕 BUY JERSEYS</button>
+        <button class="cta-btn secondary"    onclick="switchSection('players',document.querySelector('[data-section=players]'))">👤 PLAYER STATS</button>
+      </div>
+    </div>
+    <div class="portal-hero-stats">
+      <div class="hs-card"><div class="hs-num">10</div><div class="hs-label">Teams</div></div>
+      <div class="hs-card"><div class="hs-num">74</div><div class="hs-label">Matches</div></div>
+      <div class="hs-card"><div class="hs-num">10+</div><div class="hs-label">Venues</div></div>
+      <div class="hs-card"><div class="hs-num">200+</div><div class="hs-label">Players</div></div>
+    </div>
+  </div>
+  <div class="portal-cards-grid">
+    <div class="portal-nav-card ticket-card" onclick="switchSection('tickets',document.querySelector('[data-section=tickets]'))">
+      <div class="pnc-icon">🎟️</div><div class="pnc-title">BOOK TICKETS</div>
+      <div class="pnc-desc">Reserve seats for upcoming IPL matches across all 10 venues</div><div class="pnc-cta">Book Now →</div>
+    </div>
+    <div class="portal-nav-card jersey-card" onclick="switchSection('jerseys',document.querySelector('[data-section=jerseys]'))">
+      <div class="pnc-icon">👕</div><div class="pnc-title">BUY JERSEYS</div>
+      <div class="pnc-desc">Official team jerseys, player-name prints, kids sizes available</div><div class="pnc-cta">Shop Now →</div>
+    </div>
+    <div class="portal-nav-card merch-card" onclick="switchSection('merch',document.querySelector('[data-section=merch]'))">
+      <div class="pnc-icon">🛍️</div><div class="pnc-title">MERCHANDISE</div>
+      <div class="pnc-desc">Caps, bats, signed memorabilia, collectibles and more</div><div class="pnc-cta">Explore →</div>
+    </div>
+    <div class="portal-nav-card stats-card" onclick="switchSection('stats',document.querySelector('[data-section=stats]'))">
+      <div class="pnc-icon">📊</div><div class="pnc-title">PLAYER STATS</div>
+      <div class="pnc-desc">Deep dive into career stats, graphs and head-to-head comparisons</div><div class="pnc-cta">View Stats →</div>
+    </div>
+  </div>
+  <div class="section-title-row" style="margin-top:2.5rem"><h2 class="section-title">🔥 HOT DEALS & OFFERS</h2></div>
+  <div class="featured-offers-grid" id="featured-offers-grid"></div>
+  <div class="section-title-row" style="margin-top:2rem">
+    <h2 class="section-title">⭐ TOP SELLERS</h2>
+    <button class="view-all-btn" onclick="switchSection('jerseys',document.querySelector('[data-section=jerseys]'))">View All →</button>
+  </div>
+  <div class="top-sellers-grid" id="top-sellers-grid"></div>
+  <div class="offers-strip">
+    <div class="offer-item"><span class="offer-icon">🚀</span><span>FREE SHIPPING on orders ₹999+</span></div>
+    <div class="offer-item"><span class="offer-icon">🏷️</span><span>EARLY BIRD — 15% off tickets 7+ days ahead</span></div>
+    <div class="offer-item"><span class="offer-icon">🎁</span><span>BUY 2 jerseys — Get captain's wristband FREE</span></div>
+    <div class="offer-item"><span class="offer-icon">💳</span><span>0% EMI on orders above ₹3000</span></div>
+    <div class="offer-item"><span class="offer-icon">🎟️</span><span>COMBO — Ticket + Jersey bundle saves ₹500</span></div>
+  </div>
+</section>
+
+<!-- ══════ TICKETS ══════ -->
+<section class="section" id="sec-tickets">
+  <div class="section-title-row">
+    <div><h2 class="section-title">🎟️ BOOK MATCH TICKETS</h2><p class="section-sub">Official IPL 2026 tickets — select match, stand and seats</p></div>
+    <div class="ticket-legend"><span class="leg-dot avail"></span>Available<span class="leg-dot fast"></span>Fast<span class="leg-dot sold"></span>Sold Out</div>
+  </div>
+  <div class="ticket-filters">
+    <select class="filter-select" id="ticket-team-filter" onchange="filterTickets()">
+      <option value="">All Teams</option><option>MI</option><option>CSK</option><option>RCB</option><option>KKR</option><option>DC</option><option>PBKS</option><option>RR</option><option>SRH</option><option>GT</option><option>LSG</option>
+    </select>
+    <select class="filter-select" id="ticket-venue-filter" onchange="filterTickets()">
+      <option value="">All Venues</option>
+      <option>Wankhede Stadium, Mumbai</option><option>MA Chidambaram Stadium, Chennai</option>
+      <option>M Chinnaswamy Stadium, Bengaluru</option><option>Eden Gardens, Kolkata</option>
+      <option>Narendra Modi Stadium, Ahmedabad</option><option>Sawai Mansingh Stadium, Jaipur</option>
+    </select>
+    <input type="text" class="search-input" id="ticket-search" placeholder="🔍 Search match..." oninput="filterTickets()" style="max-width:220px">
+  </div>
+  <div class="matches-ticket-grid" id="ticket-matches-grid"></div>
+</section>
+
+<!-- ══════ JERSEYS ══════ -->
+<section class="section" id="sec-jerseys">
+  <div class="section-title-row">
+    <div><h2 class="section-title">👕 OFFICIAL IPL JERSEYS</h2><p class="section-sub">100% official BCCI licensed · Authentic fabric · Player-name printing available</p></div>
+    <button class="cart-view-btn" onclick="openCart()">🛒 View Cart (<span id="jersey-cart-count">0</span>)</button>
+  </div>
+  <div class="jersey-filters">
+    <div class="jf-tabs" id="jersey-team-tabs"></div>
+    <div class="jf-right">
+      <select class="filter-select" id="jersey-size-filter" onchange="filterJerseys()"><option value="">All Sizes</option><option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option></select>
+      <select class="filter-select" id="jersey-sort" onchange="filterJerseys()"><option value="default">Sort: Featured</option><option value="price-asc">Price: Low→High</option><option value="price-desc">Price: High→Low</option></select>
+    </div>
+  </div>
+  <div class="jersey-grid" id="jersey-grid"></div>
+</section>
+
+<!-- ══════ MERCHANDISE ══════ -->
+<section class="section" id="sec-merch">
+  <div class="section-title-row">
+    <div><h2 class="section-title">🛍️ IPL MERCHANDISE STORE</h2><p class="section-sub">Caps · Bats · Signed memorabilia · Collectibles · Fan accessories</p></div>
+    <button class="cart-view-btn" onclick="openCart()">🛒 View Cart (<span id="merch-cart-count">0</span>)</button>
+  </div>
+  <div class="merch-cat-tabs">
+    <button class="mct-btn active" onclick="filterMerch('all',this)">All Items</button>
+    <button class="mct-btn" onclick="filterMerch('caps',this)">🧢 Caps</button>
+    <button class="mct-btn" onclick="filterMerch('bats',this)">🏏 Bats</button>
+    <button class="mct-btn" onclick="filterMerch('signed',this)">✍️ Signed</button>
+    <button class="mct-btn" onclick="filterMerch('accessories',this)">⌚ Accessories</button>
+    <button class="mct-btn" onclick="filterMerch('collectibles',this)">🏆 Collectibles</button>
+  </div>
+  <div class="merch-grid" id="merch-grid"></div>
+</section>
+
+<!-- ══════ CART SIDEBAR ══════ -->
+<div class="cart-overlay" id="cart-overlay" onclick="closeCart()"></div>
+<div class="cart-sidebar" id="cart-sidebar">
+  <div class="cart-header"><h3>🛒 YOUR CART</h3><button onclick="closeCart()" class="cart-close-btn">✕</button></div>
+  <div class="cart-items" id="cart-items-list"><div class="cart-empty">Your cart is empty</div></div>
+  <div class="cart-footer" id="cart-footer" style="display:none">
+    <div class="cart-subtotal"><span>Subtotal</span><span id="cart-subtotal-val">₹0</span></div>
+    <div class="cart-discount" id="cart-discount-row" style="display:none"><span>Discount</span><span id="cart-discount-val" style="color:var(--accent-green)">-₹0</span></div>
+    <div class="cart-total"><span>TOTAL</span><span id="cart-total-val">₹0</span></div>
+    <input type="text" class="coupon-input" id="coupon-input" placeholder="Coupon: IPL25, CRICKET10, FLAT500…">
+    <button class="apply-coupon-btn" onclick="applyCoupon()">APPLY COUPON</button>
+    <button class="checkout-btn" onclick="proceedCheckout()">PROCEED TO CHECKOUT →</button>
+  </div>
+</div>
+
+<!-- ══════ CHECKOUT MODAL ══════ -->
+<div class="modal-backdrop" id="checkout-modal" onclick="closeCheckoutModal(event)">
+  <div class="modal-box" style="max-width:560px">
+    <button class="modal-close-btn" onclick="closeCheckoutModalDirect()">✕</button>
+    <div id="checkout-inner"></div>
+  </div>
+</div>
+
+<!-- ══════ UNIVERSAL MODAL (size picker · buy now · tickets) ══════ -->
+<div class="modal-backdrop" id="buyNow-modal" onclick="closeBuyNowModal(event)">
+  <div class="modal-box large-modal" style="max-width:680px">
+    <button class="modal-close-btn" onclick="closePayModal()">✕</button>
+    <div id="buyNow-modal-inner"></div>
+  </div>
+</div>
+
+<!-- ══════ PLAYERS ══════ -->
+<section class="section" id="sec-players">
+  <div class="players-header">
+    <div><h2 class="section-title">PLAYER DATABASE</h2><p class="section-sub">Click any player for detailed stats &amp; career graphs</p></div>
+    <div class="player-filters">
+      <input type="text" class="search-input" id="player-search" placeholder="🔍 Search player…" oninput="filterPlayers()">
+      <select class="filter-select" id="role-filter" onchange="filterPlayers()"><option value="">All Roles</option><option value="Batsman">Batsmen</option><option value="Bowler">Bowlers</option><option value="All-rounder">All-rounders</option><option value="Wicket-keeper">Wicket-keepers</option></select>
+      <select class="filter-select" id="country-filter" onchange="filterPlayers()"><option value="">All Countries</option><option value="India">India</option><option value="Australia">Australia</option><option value="England">England</option><option value="Pakistan">Pakistan</option><option value="South Africa">South Africa</option><option value="New Zealand">New Zealand</option><option value="West Indies">West Indies</option><option value="Afghanistan">Afghanistan</option></select>
+      <select class="filter-select" id="team-filter" onchange="filterPlayers()"><option value="">All IPL Teams</option><option value="MI">MI</option><option value="CSK">CSK</option><option value="RCB">RCB</option><option value="KKR">KKR</option><option value="DC">DC</option><option value="PBKS">PBKS</option><option value="RR">RR</option><option value="SRH">SRH</option><option value="GT">GT</option><option value="LSG">LSG</option></select>
+    </div>
+  </div>
+  <div class="players-count" id="players-count">Showing players</div>
+  <div class="players-grid" id="players-grid"></div>
+</section>
+
+<!-- ══════ STATISTICS ══════ -->
+<section class="section" id="sec-stats">
+
+  <!-- HEADER + TABS -->
+  <div class="section-title-row">
+    <div>
+      <h2 class="section-title">📊 IPL 2026 — GLOBAL STATISTICS DASHBOARD</h2>
+      <p class="section-sub">Real IPL data · 18 seasons · 10 teams · All formats</p>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap" id="stats-tabs">
+      <button class="mct-btn active" onclick="statsTab('ipl',this)">🏆 IPL Season</button>
+      <button class="mct-btn" onclick="statsTab('batting',this)">🏏 Batting</button>
+      <button class="mct-btn" onclick="statsTab('bowling',this)">🎯 Bowling</button>
+      <button class="mct-btn" onclick="statsTab('teams',this)">🏟️ Teams</button>
+      <button class="mct-btn" onclick="statsTab('players',this)">👤 Players DB</button>
+    </div>
+  </div>
+
+  <!-- KPI STRIP -->
+  <div id="stat-overview" class="stat-overview"></div>
+
+  <!-- ── IPL SEASON TAB ── -->
+  <div id="tab-ipl">
+    <div class="charts-row">
+      <div class="chart-card big">
+        <div class="chart-card-title">🏆 IPL TITLES WON BY TEAM (2008–2024)</div>
+        <div class="chart-container"><canvas id="chart-titles"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">🏟️ MATCHES PLAYED PER IPL SEASON</div>
+        <div class="chart-container"><canvas id="chart-seasons"></canvas></div>
+      </div>
+    </div>
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="chart-card-title">🎯 IPL 2026 POINTS TABLE</div>
+        <div class="chart-container"><canvas id="chart-points"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">🏟️ VENUES — MATCHES HOSTED (ALL TIME)</div>
+        <div class="chart-container"><canvas id="chart-venues"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">💰 IPL AUCTION RECORDS (₹ CRORE)</div>
+        <div class="chart-container"><canvas id="chart-auction"></canvas></div>
+      </div>
+    </div>
+    <div class="charts-row">
+      <div class="chart-card big">
+        <div class="chart-card-title">📈 TOTAL RUNS SCORED PER IPL SEASON (2008–2024)</div>
+        <div class="chart-container"><canvas id="chart-season-runs"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">🎯 WIN % BY TEAM (ALL IPL SEASONS)</div>
+        <div class="chart-container"><canvas id="chart-win-pct"></canvas></div>
+      </div>
+    </div>
+    <!-- 3 EXTRA CHARTS -->
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="chart-card-title">🏏 ORANGE CAP — MOST RUNS PER SEASON</div>
+        <div class="chart-container"><canvas id="chart-orange-cap"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">🎯 PURPLE CAP — MOST WICKETS PER SEASON</div>
+        <div class="chart-container"><canvas id="chart-purple-cap"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">⚡ AVERAGE RUNS PER OVER BY SEASON</div>
+        <div class="chart-container"><canvas id="chart-run-rate"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── BATTING TAB ── -->
+  <div id="tab-batting" style="display:none">
+    <div class="charts-row">
+      <div class="chart-card big">
+        <div class="chart-card-title">🏏 TOP 10 IPL ALL-TIME RUN SCORERS</div>
+        <div class="chart-container"><canvas id="chart-ipl-runs"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">📊 BATTING AVERAGE — TOP 8 (Min 50 IPL Innings)</div>
+        <div class="chart-container"><canvas id="chart-avg"></canvas></div>
+      </div>
+    </div>
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="chart-card-title">⚡ STRIKE RATE LEADERS (IPL)</div>
+        <div class="chart-container"><canvas id="chart-sr"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">💯 MOST IPL CENTURIES</div>
+        <div class="chart-container"><canvas id="chart-ipl-100s"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">🔥 HIGHEST INDIVIDUAL SCORES (IPL)</div>
+        <div class="chart-container"><canvas id="chart-hs"></canvas></div>
+      </div>
+    </div>
+    <div class="charts-row">
+      <div class="chart-card big">
+        <div class="chart-card-title">🏏 ODI CAREER RUNS — TOP 10 (All Time)</div>
+        <div class="chart-container"><canvas id="chart-runs"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">💯 ODI CENTURIES BY COUNTRY</div>
+        <div class="chart-container"><canvas id="chart-centuries"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── BOWLING TAB ── -->
+  <div id="tab-bowling" style="display:none">
+    <div class="charts-row">
+      <div class="chart-card big">
+        <div class="chart-card-title">🎯 TOP IPL WICKET TAKERS (ALL TIME)</div>
+        <div class="chart-container"><canvas id="chart-ipl-wkts"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">🌀 BEST ECONOMY RATES (IPL)</div>
+        <div class="chart-container"><canvas id="chart-economy"></canvas></div>
+      </div>
+    </div>
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="chart-card-title">🎯 ODI WICKET TAKERS — TOP 8</div>
+        <div class="chart-container"><canvas id="chart-wickets"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">📊 BOWLING TYPES — IPL 2026</div>
+        <div class="chart-container"><canvas id="chart-bowl-types"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">⚡ FASTEST DELIVERIES (KM/H) — IPL</div>
+        <div class="chart-container"><canvas id="chart-speed"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TEAMS TAB ── -->
+  <div id="tab-teams" style="display:none">
+    <div class="charts-row">
+      <div class="chart-card big">
+        <div class="chart-card-title">🏟️ TOTAL MATCHES PLAYED BY TEAM (ALL IPL)</div>
+        <div class="chart-container"><canvas id="chart-team-matches"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">🏆 IPL TROPHIES — PIE CHART</div>
+        <div class="chart-container"><canvas id="chart-trophies-pie"></canvas></div>
+      </div>
+    </div>
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="chart-card-title">📊 WINS vs LOSSES BY TEAM (ALL IPL)</div>
+        <div class="chart-container"><canvas id="chart-wl"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">💰 TEAM SALARY CAP USAGE — IPL 2026 (₹ CR)</div>
+        <div class="chart-container"><canvas id="chart-salary"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">🏟️ HOME GROUND CAPACITY (SEATS)</div>
+        <div class="chart-container"><canvas id="chart-capacity"></canvas></div>
+      </div>
+    </div>
+    <div class="charts-row">
+      <div class="chart-card big">
+        <div class="chart-card-title">📈 TEAM RUNS SCORED — IPL 2026 SEASON</div>
+        <div class="chart-container"><canvas id="chart-team-runs-2026"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">🎯 NRR COMPARISON — IPL 2026</div>
+        <div class="chart-container"><canvas id="chart-nrr"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PLAYERS DB TAB ── -->
+  <div id="tab-players" style="display:none">
+    <div class="charts-row">
+      <div class="chart-card big">
+        <div class="chart-card-title">🌍 PLAYER NATIONALITY DISTRIBUTION</div>
+        <div class="chart-container"><canvas id="chart-nations"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">👤 PLAYER ROLES BREAKDOWN</div>
+        <div class="chart-container"><canvas id="chart-roles"></canvas></div>
+      </div>
+    </div>
+    <div class="section-title-row" style="margin-top:1.5rem"><h2 class="section-title" style="font-size:1.2rem">COMPLETE PLAYER BATTING STATS</h2></div>
+    <div class="table-card"><div class="table-scroll">
+      <table class="cricket-table" id="full-stats-table">
+        <thead><tr><th>#</th><th>PLAYER</th><th>COUNTRY</th><th>ROLE</th><th>M</th><th>RUNS</th><th>AVG</th><th>SR</th><th>HS</th><th>100s</th><th>50s</th><th>IPL RUNS</th><th>IPL TEAM</th></tr></thead>
+        <tbody id="stats-table-body"></tbody>
+      </table>
+    </div></div>
+  </div>
+
+</section>
+
+<!-- ══════ COMPARE ══════ -->
+<section class="section" id="sec-compare">
+  <div class="section-title-row"><h2 class="section-title">HEAD-TO-HEAD COMPARISON</h2><p class="section-sub">Select two players to compare</p></div>
+  <div class="compare-selectors">
+    <div class="compare-picker"><label>PLAYER 1</label><select id="compare-p1" onchange="updateCompare()"><option value="">— Select —</option></select></div>
+    <div class="compare-vs-badge">VS</div>
+    <div class="compare-picker"><label>PLAYER 2</label><select id="compare-p2" onchange="updateCompare()"><option value="">— Select —</option></select></div>
+  </div>
+  <div id="compare-result"></div>
+</section>
+
+<!-- ══════ MY ACCOUNT ══════ -->
+<section class="section" id="sec-myaccount">
+  <div id="myaccount-inner"></div>
+</section>
+
+<!-- ══════ USER DATABASE ══════ -->
+<section class="section" id="sec-users">
+  <div class="section-title-row">
+    <div><h2 class="section-title">🗄️ USER DATABASE</h2><p class="section-sub">Registered accounts · Login activity · Orders & tickets</p></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <input type="text" class="search-input" id="user-search" placeholder="🔍 Search users…" oninput="filterUsersSection()" style="max-width:200px">
+      <button class="view-all-btn" onclick="exportUsersCSV()">📥 Export CSV</button>
+      <button class="view-all-btn" style="border-color:rgba(255,31,61,0.4);color:#ff6b80" onclick="clearAllUsers()">🗑️ Clear All</button>
+    </div>
+  </div>
+
+  <!-- STATS OVERVIEW -->
+  <div id="users-stats-row" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:1rem;margin-bottom:1.5rem"></div>
+
+  <!-- TABS: Users / Login Activity -->
+  <div style="display:flex;gap:6px;margin-bottom:1.5rem" id="db-tabs">
+    <button class="mct-btn active" onclick="showDbTab('accounts',this)">👥 Accounts</button>
+    <button class="mct-btn" onclick="showDbTab('logins',this)">🔐 Login Activity</button>
+  </div>
+
+  <!-- ACCOUNTS TABLE -->
+  <div id="db-tab-accounts">
+    <div class="table-card"><div class="table-scroll">
+      <table class="cricket-table" id="users-table" style="min-width:800px">
+        <thead><tr><th>#</th><th>USER</th><th>PHONE</th><th>FAV TEAM</th><th>ORDERS</th><th>TICKETS</th><th>SPENT</th><th>LOGINS</th><th>LAST LOGIN</th><th>JOINED</th><th>ACTION</th></tr></thead>
+        <tbody id="users-tbody"></tbody>
+      </table>
+    </div></div>
+  </div>
+
+  <!-- LOGIN ACTIVITY TABLE -->
+  <div id="db-tab-logins" style="display:none">
+    <div class="table-card"><div class="table-scroll">
+      <table class="cricket-table" style="min-width:600px">
+        <thead><tr><th>#</th><th>USER</th><th>EMAIL</th><th>EVENT</th><th>DATE & TIME</th></tr></thead>
+        <tbody id="login-log-tbody"></tbody>
+      </table>
+    </div></div>
+  </div>
+
+  <div style="margin-top:1rem;font-size:0.75rem;color:var(--text-muted);font-family:'Space Mono',monospace">
+    ℹ️ Data stored in browser localStorage · <a href="admin.html" style="color:var(--accent-gold);text-decoration:none" target="_blank">Open full admin panel →</a>
+  </div>
+</section>
+
+</main>
+
+<!-- PLAYER DETAIL MODAL -->
+<div class="modal-backdrop" id="player-modal" onclick="closePlayerModal(event)">
+  <div class="modal-box large-modal"><button class="modal-close-btn" onclick="closePlayerModalDirect()">✕</button><div id="modal-inner"></div></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">🏏 CRICKET HUB 2026</div>
+    <div class="footer-links"><span>Official BCCI Licensed</span><span>·</span><span>Secure Payments</span><span>·</span><span>Charts by Chart.js</span></div>
+    <div class="footer-copy">© 2026 IPL Cricket Portal · All merchandise is BCCI official licensed</div>
+  </div>
+</footer>
+
+<script src="js/data.js"></script>
+<script src="js/portal.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
