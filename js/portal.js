@@ -98,10 +98,6 @@ const JERSEYS=[
 
 // ── Merchandise — reliable image URLs per category ─────────────
 const MERCH_IMGS = {
-  caps:        'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=400&q=80',
-  caps2:       'https://images.unsplash.com/photo-1521369909029-2afed882baee?w=400&q=80',
-  caps3:       'https://images.unsplash.com/photo-1556306535-38febf6cdbe1?w=400&q=80',
-  caps4:       'https://images.unsplash.com/photo-1575428652377-a2d80e2277fc?w=400&q=80',
   bat:         'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=400&q=80',
   bat2:        'https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=400&q=80',
   bat3:        'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&q=80',
@@ -141,10 +137,6 @@ const MERCHANDISE=[
 
 // ── Merch image map — local uploaded real product images ────────
 const MERCH_IMG_MAP = {
-  mc1:  'images/merch/v28_cap_mi.jpg',
-  mc2:  'images/merch/v28_cap_csk.jpg',
-  mc3:  'images/merch/v28_cap_rcb.jpg',
-  mc4:  'images/merch/v28_cap_kkr.jpg',
   mc5:  'images/merch/mc5_vk_bat.png',
   mc6:  'images/merch/mc6_rohit_bat.jpg',
   mc7:  'images/merch/mc7_mini_bat.jpg',
@@ -1453,7 +1445,7 @@ function renderMerchGrid(){
   const list=activeMerchCat==='all'?MERCHANDISE:MERCHANDISE.filter(m=>m.cat===activeMerchCat);
   grid.innerHTML=list.map(m=>{
     const disc=Math.round((m.mrp-m.price)/m.mrp*100);
-    const catColors={caps:'#0ea5e9',bats:'#f0a500',signed:'#a855f7',accessories:'#00d97e',collectibles:'#e85d04'};
+    const catColors={bats:'#f0a500',signed:'#a855f7',accessories:'#00d97e',collectibles:'#e85d04'};
     const cc=catColors[m.cat]||'#888';
     const imgUrl=(MERCH_IMG_MAP[m.id]||'')+'?nocache='+m.id+'_v28';
     return `<div class="merch-card">
