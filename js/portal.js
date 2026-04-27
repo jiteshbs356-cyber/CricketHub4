@@ -898,7 +898,7 @@ function renderTicketModal(){
       </div>
       <div style="display:flex;gap:8px">
         <button class="tbm-add-cart-btn" style="background:var(--bg-card3);color:var(--text-secondary);flex:0.4" onclick="tsStep(2)">← BACK</button>
-        <button class="tbm-add-cart-btn" style="flex:1" onclick="tsStep(4)">CONTINUE TO PAYMENT →</button>
+        <button class="tbm-add-cart-btn" style="flex:1" onclick="proceedToTicketPayment()">CONTINUE TO PAYMENT →</button>
       </div>`;
   }
 
@@ -1028,7 +1028,7 @@ function renderCheckoutModal(){
       <div class="form-field"><label>Address</label><input id="co-addr" placeholder="Flat No., Building, Street, City — PIN Code"></div>
       <div class="form-field"><label>State</label><select id="co-state"><option>Maharashtra</option><option>Tamil Nadu</option><option>Karnataka</option><option>Delhi</option><option>West Bengal</option><option>Rajasthan</option><option>Gujarat</option><option>Telangana</option><option>Punjab</option><option>Uttar Pradesh</option><option>Other</option></select></div>
     </div>
-    <button class="checkout-btn" onclick="goCheckoutStep(2)" style="margin-top:1rem">CONTINUE TO PAYMENT →</button>`;
+    <button class="checkout-btn" onclick="proceedToMerchPayment()" style="margin-top:1rem">CONTINUE TO PAYMENT →</button>`;
   } else if(checkoutStep===2){
     body=`<h3 style="font-family:Oswald,sans-serif;font-size:1.3rem;margin-bottom:1rem;letter-spacing:1px">PAYMENT METHOD</h3>
     <div class="payment-methods">
@@ -1098,6 +1098,55 @@ function renderCheckoutModal(){
   }
   document.getElementById('checkout-inner').innerHTML=`<div class="checkout-steps">${stepsHtml}</div>${body}`;
 }
+// VALIDATION FUNCTIONS
+function validateTicketDetails(){
+  const fname = document.getElementById('ts-fname')?.value?.trim();
+  const lname = document.getElementById('ts-lname')?.value?.trim();
+  const email = document.getElementById('ts-email')?.value?.trim();
+  const phone = document.getElementById('ts-phone')?.value?.trim();
+  
+  if(!fname){showToast('Please enter your First Name','error');return false;}
+  if(!lname){showToast('Please enter your Last Name','error');return false;}
+  if(!email){showToast('Please enter your Email','error');return false;}
+  if(!email.includes('@')){showToast('Please enter a valid Email address','error');return false;}
+  if(!phone){showToast('Please enter your Phone Number','error');return false;}
+  if(phone.replace(/\D/g,'').length<10){showToast('Phone number must be at least 10 digits','error');return false;}
+  
+  return true;
+}
+
+function validateCheckoutDetails(){
+  const fname = document.getElementById('co-fname')?.value?.trim();
+  const lname = document.getElementById('co-lname')?.value?.trim();
+  const email = document.getElementById('co-email')?.value?.trim();
+  const phone = document.getElementById('co-phone')?.value?.trim();
+  const addr = document.getElementById('co-addr')?.value?.trim();
+  const state = document.getElementById('co-state')?.value?.trim();
+  
+  if(!fname){showToast('Please enter your First Name','error');return false;}
+  if(!lname){showToast('Please enter your Last Name','error');return false;}
+  if(!email){showToast('Please enter your Email','error');return false;}
+  if(!email.includes('@')){showToast('Please enter a valid Email address','error');return false;}
+  if(!phone){showToast('Please enter your Phone Number','error');return false;}
+  if(phone.replace(/\D/g,'').length<10){showToast('Phone number must be at least 10 digits','error');return false;}
+  if(!addr){showToast('Please enter your Address','error');return false;}
+  if(!state){showToast('Please select a State','error');return false;}
+  
+  return true;
+}
+
+function proceedToTicketPayment(){
+  if(validateTicketDetails()){
+    tsStep(4);
+  }
+}
+
+function proceedToMerchPayment(){
+  if(validateCheckoutDetails()){
+    goCheckoutStep(2);
+  }
+}
+
 window.goCheckoutStep=(s)=>{checkoutStep=s;renderCheckoutModal();};
 function closeCheckoutModal(e){if(e.target===document.getElementById('checkout-modal'))closeCheckoutModalDirect();}
 function closeCheckoutModalDirect(){document.getElementById('checkout-modal')?.classList.remove('open');document.body.style.overflow='';checkoutStep=1;}
