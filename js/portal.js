@@ -390,6 +390,16 @@ function openBuyNow(type,itemId){
   document.body.style.overflow='hidden';
 }
 
+function getBuyNowImageHtml(item, type){
+  if(type==='jersey'){
+    const url = item.specialImg || JERSEY_IMG[item.team] || '';
+    if(url) return `<img src="${url}" alt="${item.name}" style="width:100px;height:100px;object-fit:contain;border-radius:12px;box-shadow:0 10px 20px rgba(0,0,0,0.2);">`;
+  }
+  const url = MERCH_IMG_MAP[item.id] || '';
+  if(url) return `<img src="${url}" alt="${item.name}" style="width:100px;height:100px;object-fit:contain;border-radius:12px;box-shadow:0 10px 20px rgba(0,0,0,0.2);">`;
+  return `<span style="font-size:3rem">${item.img||'📦'}</span>`;
+}
+
 function renderBuyNow(){
   const{type,item,size,qty,step}=buyNowState;
   if(!item)return;
@@ -403,7 +413,7 @@ function renderBuyNow(){
   if(step===1){
     body=`
       <div style="display:flex;gap:1rem;align-items:center;background:var(--bg-deep);border-radius:8px;padding:1rem;margin-bottom:1rem">
-        <span style="font-size:3rem">${item.img}</span>
+        ${getBuyNowImageHtml(item, type)}
         <div><div style="font-weight:700">${item.name}</div><div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px">${type==='jersey'?(IPL_2026[item.team]?.name||item.team):(item.desc||'')}</div><div style="color:var(--accent-gold);font-family:Space Mono,monospace;font-weight:700;margin-top:4px">₹${item.price.toLocaleString()}</div></div>
       </div>
       ${type==='jersey'?`
@@ -421,9 +431,9 @@ function renderBuyNow(){
     body=`
       <div class="tbm-section-title">DELIVERY DETAILS</div>
       <div class="checkout-form">
-        <div class="checkout-two-col"><div class="form-field"><label>First Name *</label><input id="bn-fname" placeholder="Rahul"></div><div class="form-field"><label>Last Name *</label><input id="bn-lname" placeholder="Sharma"></div></div>
+        <div class="checkout-two-col"><div class="form-field"><label>First Name *</label><input id="bn-fname" placeholder="Rahul" inputmode="text" oninput="sanitizeNameInput(this)"></div><div class="form-field"><label>Last Name *</label><input id="bn-lname" placeholder="Sharma" inputmode="text" oninput="sanitizeNameInput(this)"></div></div>
         <div class="form-field"><label>Email Address *</label><input id="bn-email" placeholder="you@email.com" type="email"></div>
-        <div class="form-field"><label>Phone *</label><input id="bn-phone" placeholder="+91 98765 43210" type="tel"></div>
+        <div class="form-field"><label>Phone *</label><input id="bn-phone" placeholder="+91 98765 43210" type="tel" inputmode="tel" oninput="sanitizePhoneInput(this)"></div>
         <div class="form-field"><label>Full Delivery Address *</label><input id="bn-addr" placeholder="Flat No., Building, Street, City — PIN Code"></div>
         <div class="form-field"><label>State</label><select id="bn-state"><option>Maharashtra</option><option>Tamil Nadu</option><option>Karnataka</option><option>Delhi</option><option>West Bengal</option><option>Rajasthan</option><option>Gujarat</option><option>Telangana</option><option>Punjab</option><option>Uttar Pradesh</option><option>Other</option></select></div>
       </div>
@@ -436,9 +446,6 @@ function renderBuyNow(){
         <div class="pm-option selected" onclick="selectPM(this)"><span class="pm-icon">💳</span>Credit / Debit Card</div>
         <div class="pm-option" onclick="selectPM(this)"><span class="pm-icon">📱</span>UPI / GPay / PhonePe</div>
         <div class="pm-option" onclick="selectPM(this)"><span class="pm-icon">🏦</span>Net Banking</div>
-        <div class="pm-option" onclick="selectPM(this)"><span class="pm-icon">📲</span>Paytm / Wallets</div>
-        <div class="pm-option" onclick="selectPM(this)"><span class="pm-icon">💵</span>Cash on Delivery</div>
-        <div class="pm-option" onclick="selectPM(this)"><span class="pm-icon">📅</span>EMI (0% Interest)</div>
       </div>
       <div class="checkout-form" style="margin-top:0.75rem">
         <div class="form-field"><label>Card Number</label><input placeholder="4242 4242 4242 4242" maxlength="19" oninput="fmtCard(this)"></div>
@@ -492,7 +499,7 @@ function renderBuyNow(){
 
 window.bnSelectSize=(s)=>{buyNowState.size=s;renderBuyNow();};
 window.bnQty=(d)=>{buyNowState.qty=Math.max(1,Math.min(10,buyNowState.qty+d));renderBuyNow();};
-window.bnStep=(s)=>{buyNowState.step=s;renderBuyNow();};
+window.bnStep=(s)=>{ if(s===3 && !validateBuyNowDetails()) return; buyNowState.step=s; renderBuyNow(); };
 window.selectPM=(el)=>{document.querySelectorAll('.pm-option').forEach(b=>b.classList.remove('selected'));el.classList.add('selected');};
 window.fmtCard=(el)=>{el.value=el.value.replace(/\D/g,'').replace(/(.{4})/g,'$1 ').trim().slice(0,19);};
 
@@ -884,9 +891,9 @@ function renderTicketModal(){
     body=`
       <div class="tbm-section-title">BOOKING DETAILS</div>
       <div class="checkout-form">
-        <div class="checkout-two-col"><div class="form-field"><label>First Name *</label><input id="ts-fname" placeholder="Rahul"></div><div class="form-field"><label>Last Name *</label><input id="ts-lname" placeholder="Sharma"></div></div>
+        <div class="checkout-two-col"><div class="form-field"><label>First Name *</label><input id="ts-fname" placeholder="Rahul" inputmode="text" oninput="sanitizeNameInput(this)"></div><div class="form-field"><label>Last Name *</label><input id="ts-lname" placeholder="Sharma" inputmode="text" oninput="sanitizeNameInput(this)"></div></div>
         <div class="form-field"><label>Email *</label><input id="ts-email" placeholder="you@email.com" type="email"></div>
-        <div class="form-field"><label>Phone *</label><input id="ts-phone" placeholder="+91 98765 43210" type="tel"></div>
+        <div class="form-field"><label>Phone *</label><input id="ts-phone" placeholder="+91 98765 43210" type="tel" inputmode="tel" oninput="sanitizePhoneInput(this)"></div>
         <div class="form-field"><label>ID Proof Type</label><select id="ts-id"><option>Aadhaar Card</option><option>PAN Card</option><option>Passport</option><option>Voter ID</option><option>Driving Licence</option></select></div>
         <div class="form-field"><label>ID Number</label><input id="ts-idnum" placeholder="Enter ID number"></div>
       </div>
@@ -910,9 +917,6 @@ function renderTicketModal(){
         <div class="pm-option selected" onclick="selectPM(this)"><span class="pm-icon">💳</span>Credit / Debit Card</div>
         <div class="pm-option" onclick="selectPM(this)"><span class="pm-icon">📱</span>UPI / GPay / PhonePe</div>
         <div class="pm-option" onclick="selectPM(this)"><span class="pm-icon">🏦</span>Net Banking</div>
-        <div class="pm-option" onclick="selectPM(this)"><span class="pm-icon">📲</span>Paytm / Wallets</div>
-        <div class="pm-option" onclick="selectPM(this)"><span class="pm-icon">💵</span>Cash on Delivery</div>
-        <div class="pm-option" onclick="selectPM(this)"><span class="pm-icon">📅</span>EMI 0%</div>
       </div>
       <div class="checkout-form" style="margin-top:0.75rem">
         <div class="form-field"><label>Card Number</label><input placeholder="4242 4242 4242 4242" maxlength="19" oninput="fmtCard(this)"></div>
@@ -1022,9 +1026,9 @@ function renderCheckoutModal(){
   if(checkoutStep===1){
     body=`<h3 style="font-family:Oswald,sans-serif;font-size:1.3rem;margin-bottom:1rem;letter-spacing:1px">DELIVERY DETAILS</h3>
     <div class="checkout-form">
-      <div class="checkout-two-col"><div class="form-field"><label>First Name</label><input id="co-fname" placeholder="Rahul"></div><div class="form-field"><label>Last Name</label><input id="co-lname" placeholder="Sharma"></div></div>
+      <div class="checkout-two-col"><div class="form-field"><label>First Name</label><input id="co-fname" placeholder="Rahul" inputmode="text" oninput="sanitizeNameInput(this)"></div><div class="form-field"><label>Last Name</label><input id="co-lname" placeholder="Sharma" inputmode="text" oninput="sanitizeNameInput(this)"></div></div>
       <div class="form-field"><label>Email</label><input id="co-email" placeholder="you@email.com" type="email"></div>
-      <div class="form-field"><label>Phone</label><input id="co-phone" placeholder="+91 98765 43210" type="tel"></div>
+      <div class="form-field"><label>Phone</label><input id="co-phone" placeholder="+91 98765 43210" type="tel" inputmode="tel" oninput="sanitizePhoneInput(this)"></div>
       <div class="form-field"><label>Address</label><input id="co-addr" placeholder="Flat No., Building, Street, City — PIN Code"></div>
       <div class="form-field"><label>State</label><select id="co-state"><option>Maharashtra</option><option>Tamil Nadu</option><option>Karnataka</option><option>Delhi</option><option>West Bengal</option><option>Rajasthan</option><option>Gujarat</option><option>Telangana</option><option>Punjab</option><option>Uttar Pradesh</option><option>Other</option></select></div>
     </div>
@@ -1035,9 +1039,6 @@ function renderCheckoutModal(){
       <div class="pm-option selected" onclick="selectPM(this)"><span class="pm-icon">💳</span>Credit/Debit Card</div>
       <div class="pm-option" onclick="selectPM(this)"><span class="pm-icon">📱</span>UPI / GPay</div>
       <div class="pm-option" onclick="selectPM(this)"><span class="pm-icon">🏦</span>Net Banking</div>
-      <div class="pm-option" onclick="selectPM(this)"><span class="pm-icon">📲</span>Wallets</div>
-      <div class="pm-option" onclick="selectPM(this)"><span class="pm-icon">💵</span>Cash on Delivery</div>
-      <div class="pm-option" onclick="selectPM(this)"><span class="pm-icon">📅</span>EMI 0%</div>
     </div>
     <div class="checkout-form" style="margin-top:0.75rem">
       <div class="form-field"><label>Card Number</label><input placeholder="4242 4242 4242 4242" maxlength="19" oninput="fmtCard(this)"></div>
@@ -1099,19 +1100,89 @@ function renderCheckoutModal(){
   document.getElementById('checkout-inner').innerHTML=`<div class="checkout-steps">${stepsHtml}</div>${body}`;
 }
 // VALIDATION FUNCTIONS
+function isAlphabeticName(value) {
+  return /^[A-Za-z\s'\-]+$/.test(value);
+}
+
+function sanitizeNameInput(input){
+  if(!input) return;
+  const original = input.value;
+  const sanitized = original.replace(/[^A-Za-z\s'\-]/g, '');
+  if(original !== sanitized){
+    input.value = sanitized;
+    showToast('Name Must Contain Alphabet Only','error');
+  }
+}
+
+function sanitizePhoneInput(input){
+  if(!input) return;
+  const original = input.value;
+  const sanitized = original.replace(/[^0-9+\s\-]/g, '');
+  if(original !== sanitized){
+    input.value = sanitized;
+    showToast('Enter Number Only','error');
+  }
+}
+
+function validateNameField(value, label) {
+  if(!value){
+    showToast(`Please enter your ${label}`,'error');
+    return false;
+  }
+  if(!isAlphabeticName(value)){
+    showToast(`Please enter alphabet characters only for ${label}`,'error');
+    return false;
+  }
+  return true;
+}
+
+function validatePhoneField(value){
+  if(!value){
+    showToast('Please enter your Phone Number','error');
+    return false;
+  }
+  if(/[^0-9+\s\-]/.test(value)){
+    showToast('Enter Number Only','error');
+    return false;
+  }
+  if(value.replace(/\D/g,'').length<10){
+    showToast('Phone number must be at least 10 digits','error');
+    return false;
+  }
+  return true;
+}
+
 function validateTicketDetails(){
   const fname = document.getElementById('ts-fname')?.value?.trim();
   const lname = document.getElementById('ts-lname')?.value?.trim();
   const email = document.getElementById('ts-email')?.value?.trim();
   const phone = document.getElementById('ts-phone')?.value?.trim();
   
-  if(!fname){showToast('Please enter your First Name','error');return false;}
-  if(!lname){showToast('Please enter your Last Name','error');return false;}
+  if(!validateNameField(fname,'First Name')) return false;
+  if(!validateNameField(lname,'Last Name')) return false;
   if(!email){showToast('Please enter your Email','error');return false;}
   if(!email.includes('@')){showToast('Please enter a valid Email address','error');return false;}
-  if(!phone){showToast('Please enter your Phone Number','error');return false;}
-  if(phone.replace(/\D/g,'').length<10){showToast('Phone number must be at least 10 digits','error');return false;}
+  if(!validatePhoneField(phone)) return false;
   
+  return true;
+}
+
+function validateBuyNowDetails(){
+  const fname = document.getElementById('bn-fname')?.value?.trim();
+  const lname = document.getElementById('bn-lname')?.value?.trim();
+  const email = document.getElementById('bn-email')?.value?.trim();
+  const phone = document.getElementById('bn-phone')?.value?.trim();
+  const addr = document.getElementById('bn-addr')?.value?.trim();
+  const state = document.getElementById('bn-state')?.value?.trim();
+
+  if(!validateNameField(fname,'First Name')) return false;
+  if(!validateNameField(lname,'Last Name')) return false;
+  if(!email){showToast('Please enter your Email Address','error');return false;}
+  if(!email.includes('@')){showToast('Please enter a valid Email address','error');return false;}
+  if(!validatePhoneField(phone)) return false;
+  if(!addr){showToast('Please enter your Address','error');return false;}
+  if(!state){showToast('Please select a State','error');return false;}
+
   return true;
 }
 
@@ -1123,12 +1194,11 @@ function validateCheckoutDetails(){
   const addr = document.getElementById('co-addr')?.value?.trim();
   const state = document.getElementById('co-state')?.value?.trim();
   
-  if(!fname){showToast('Please enter your First Name','error');return false;}
-  if(!lname){showToast('Please enter your Last Name','error');return false;}
+  if(!validateNameField(fname,'First Name')) return false;
+  if(!validateNameField(lname,'Last Name')) return false;
   if(!email){showToast('Please enter your Email','error');return false;}
   if(!email.includes('@')){showToast('Please enter a valid Email address','error');return false;}
-  if(!phone){showToast('Please enter your Phone Number','error');return false;}
-  if(phone.replace(/\D/g,'').length<10){showToast('Phone number must be at least 10 digits','error');return false;}
+  if(!validatePhoneField(phone)) return false;
   if(!addr){showToast('Please enter your Address','error');return false;}
   if(!state){showToast('Please select a State','error');return false;}
   
