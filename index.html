@@ -211,6 +211,81 @@
   </div>
 </div>
 
+<!-- ══════ UPI QR PAYMENT MODAL ══════ -->
+<div id="scanner-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:4000;backdrop-filter:blur(4px);" onclick="closeUPIScanner()"></div>
+<div id="upi-scanner" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:4001;background:#0a1628;border:1.5px solid rgba(240,165,0,0.35);border-radius:18px;padding:2rem;max-width:420px;width:92%;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,0.7)">
+  <!-- Header -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span style="font-size:1.6rem">💳</span>
+      <div style="text-align:left">
+        <div style="font-family:'Oswald',sans-serif;font-size:1.1rem;font-weight:700;color:#f0a500;letter-spacing:1px">UPI PAYMENT</div>
+        <div style="font-size:0.68rem;color:#64748b;letter-spacing:2px">SCAN WITH ANY UPI APP</div>
+      </div>
+    </div>
+    <button onclick="closeUPIScanner()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#8ba3c7;border-radius:8px;padding:5px 10px;cursor:pointer;font-size:0.8rem">✕</button>
+  </div>
+
+  <!-- Amount display -->
+  <div id="upi-amount-display" style="background:rgba(240,165,0,0.08);border:1px solid rgba(240,165,0,0.25);border-radius:10px;padding:10px 16px;margin-bottom:1.2rem;display:flex;justify-content:space-between;align-items:center">
+    <span style="font-size:0.75rem;color:#64748b;text-transform:uppercase;letter-spacing:1px">Amount</span>
+    <span id="upi-pay-amount" style="font-family:'Oswald',sans-serif;font-size:1.4rem;font-weight:700;color:#f0a500">₹0</span>
+  </div>
+
+  <!-- QR Code Box -->
+  <div style="background:#fff;border-radius:14px;padding:14px;display:inline-block;margin-bottom:1rem;box-shadow:0 8px 32px rgba(0,0,0,0.4);position:relative">
+    <img id="upi-qr-img" src="" alt="UPI QR Code" style="width:220px;height:220px;display:block;border-radius:6px" />
+    <!-- Animated scanning line -->
+    <div id="qr-scan-line" style="position:absolute;left:14px;right:14px;height:2px;background:linear-gradient(90deg,transparent,#22c55e,transparent);animation:scanLine 2s ease-in-out infinite;top:50%;display:none"></div>
+  </div>
+  <style>
+    @keyframes scanLine{0%{top:14px;opacity:0}10%{opacity:1}90%{opacity:1}100%{top:calc(100% - 16px);opacity:0}}
+    @keyframes pulseGreen{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,0.4)}50%{box-shadow:0 0 0 12px rgba(34,197,94,0)}}
+  </style>
+
+  <!-- UPI App logos -->
+  <div style="display:flex;gap:8px;justify-content:center;margin-bottom:1rem;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:5px 10px">
+      <span style="font-size:1rem">📲</span><span style="font-size:0.7rem;color:#8ba3c7">GPay</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:5px 10px">
+      <span style="font-size:1rem">💜</span><span style="font-size:0.7rem;color:#8ba3c7">PhonePe</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:5px 10px">
+      <span style="font-size:1rem">🔵</span><span style="font-size:0.7rem;color:#8ba3c7">Paytm</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:5px 10px">
+      <span style="font-size:1rem">🟠</span><span style="font-size:0.7rem;color:#8ba3c7">BHIM</span>
+    </div>
+  </div>
+
+  <!-- UPI ID text -->
+  <div style="font-size:0.72rem;color:#64748b;margin-bottom:0.5rem">Or pay directly to UPI ID</div>
+  <div style="background:#060f1f;border:1px solid rgba(240,165,0,0.2);border-radius:8px;padding:8px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem">
+    <span style="font-family:'Space Mono',monospace;font-size:0.82rem;color:#f0a500" id="upi-id-display">crickethu b@upi</span>
+    <button onclick="copyUPIId()" style="background:none;border:none;color:#64748b;cursor:pointer;font-size:0.72rem;padding:2px 6px" id="copy-upi-btn">📋 Copy</button>
+  </div>
+
+  <!-- Status area -->
+  <div id="upi-status-area">
+    <div style="font-size:0.75rem;color:#64748b;margin-bottom:1rem">After payment, click the button below to confirm</div>
+    <div style="display:flex;gap:8px;justify-content:center">
+      <button onclick="closeUPIScanner()" style="flex:1;padding:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#8ba3c7;border-radius:8px;cursor:pointer;font-size:0.82rem">✕ Cancel</button>
+      <button onclick="confirmUPIPayment()" style="flex:2;padding:10px;background:linear-gradient(135deg,#22c55e,#16a34a);border:none;color:#fff;border-radius:8px;cursor:pointer;font-family:'Oswald',sans-serif;font-size:0.95rem;font-weight:700;letter-spacing:1px">✓ PAYMENT DONE</button>
+    </div>
+  </div>
+
+  <!-- Success state (hidden initially) -->
+  <div id="upi-success-area" style="display:none">
+    <div style="width:64px;height:64px;background:linear-gradient(135deg,#22c55e,#16a34a);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 1rem;animation:pulseGreen 1s ease-out">✓</div>
+    <div style="font-family:'Oswald',sans-serif;font-size:1.3rem;font-weight:700;color:#22c55e;margin-bottom:0.4rem">PAYMENT SUCCESSFUL!</div>
+    <div style="font-size:0.8rem;color:#8ba3c7;margin-bottom:1.2rem">Your booking is being confirmed...</div>
+    <div style="width:100%;height:4px;background:#0f2244;border-radius:2px;overflow:hidden">
+      <div id="upi-progress-bar" style="height:100%;background:linear-gradient(90deg,#22c55e,#f0a500);border-radius:2px;width:0%;transition:width 0.1s linear"></div>
+    </div>
+  </div>
+</div>
+
 <!-- ══════ PLAYERS ══════ -->
 <section class="section" id="sec-players">
   <div class="players-header">
@@ -509,5 +584,171 @@
 <script src="js/data.js"></script>
 <script src="js/portal.js"></script>
 <script src="js/app.js"></script>
+
+<!-- ═══════════════════════════════════════════════════════════
+     REAL UPI QR CODE SYSTEM — Cricket Hub IPL Portal
+     Generates actual scannable UPI QR that opens payment apps
+     ═══════════════════════════════════════════════════════════ -->
+<script>
+// ── UPI Config ──────────────────────────────────────────────
+const UPI_CONFIG = {
+  vpa:  'crickethub@upi',          // UPI VPA (Virtual Payment Address)
+  name: 'Cricket Hub IPL Store',   // Payee name shown in apps
+  mc:   '5945',                    // Merchant category
+  tid:  '',                        // Transaction ID (generated per payment)
+  orgid: 'IPL2026'
+};
+
+// Current payment context (set by openUPIScannerWithAmount)
+let _upiContext = {
+  amount: 0,
+  label: '',
+  onSuccess: null   // callback after payment confirmed
+};
+
+// ── Build UPI deep-link & QR ─────────────────────────────────
+function buildUPIString(amount, label) {
+  const tid = 'CH' + Date.now();
+  const note = encodeURIComponent('IPL Portal – ' + label);
+  const payeeName = encodeURIComponent(UPI_CONFIG.name);
+  return `upi://pay?pa=${UPI_CONFIG.vpa}&pn=${payeeName}&tn=${note}&am=${amount.toFixed(2)}&cu=INR&tid=${tid}`;
+}
+
+function buildQRUrl(upiString) {
+  // Use the free QR Server API — returns a real PNG QR code
+  const encoded = encodeURIComponent(upiString);
+  return `https://api.qrserver.com/v1/create-qr-code/?size=220x220&ecc=M&data=${encoded}`;
+}
+
+// ── Public: open the UPI scanner with real QR ────────────────
+// Called from portal.js/app.js wherever UPI QR is triggered
+// Also patches the old simulateScannerResult / openUPIScanner hooks
+function openUPIScannerWithAmount(amount, label, onSuccessCallback) {
+  _upiContext.amount     = amount;
+  _upiContext.label      = label || 'IPL Purchase';
+  _upiContext.onSuccess  = onSuccessCallback || null;
+
+  const upiStr = buildUPIString(amount, _upiContext.label);
+  const qrUrl  = buildQRUrl(upiStr);
+
+  // Populate modal
+  document.getElementById('upi-pay-amount').textContent = '₹' + amount.toLocaleString('en-IN');
+  document.getElementById('upi-id-display').textContent  = UPI_CONFIG.vpa;
+
+  const qrImg = document.getElementById('upi-qr-img');
+  qrImg.src   = '';
+  qrImg.style.opacity = '0.4';
+  qrImg.style.filter  = 'blur(2px)';
+
+  // Load QR
+  const tmpImg = new Image();
+  tmpImg.onload = () => {
+    qrImg.src = tmpImg.src;
+    qrImg.style.opacity = '1';
+    qrImg.style.filter  = 'none';
+    document.getElementById('qr-scan-line').style.display = 'block';
+  };
+  tmpImg.onerror = () => {
+    // Fallback: show a text QR placeholder
+    qrImg.src = `https://chart.googleapis.com/chart?chs=220x220&cht=qr&chl=${encodeURIComponent(upiStr)}&choe=UTF-8`;
+    qrImg.style.opacity = '1';
+    qrImg.style.filter  = 'none';
+  };
+  tmpImg.src = qrUrl;
+
+  // Reset states
+  document.getElementById('upi-status-area').style.display  = 'block';
+  document.getElementById('upi-success-area').style.display  = 'none';
+
+  // Show modal
+  document.getElementById('scanner-overlay').style.display = 'block';
+  document.getElementById('upi-scanner').style.display     = 'block';
+  document.body.style.overflow = 'hidden';
+}
+
+// ── Copy UPI ID ───────────────────────────────────────────────
+function copyUPIId() {
+  navigator.clipboard?.writeText(UPI_CONFIG.vpa).catch(()=>{});
+  const btn = document.getElementById('copy-upi-btn');
+  if (btn) { btn.textContent = '✓ Copied!'; setTimeout(()=>{ btn.textContent = '📋 Copy'; }, 2000); }
+}
+
+// ── User taps "Payment Done" ──────────────────────────────────
+function confirmUPIPayment() {
+  // Show success animation
+  document.getElementById('upi-status-area').style.display  = 'none';
+  document.getElementById('upi-success-area').style.display = 'block';
+  document.getElementById('qr-scan-line').style.display     = 'none';
+
+  // Animate progress bar
+  let pct = 0;
+  const bar = document.getElementById('upi-progress-bar');
+  const interval = setInterval(() => {
+    pct += 2;
+    bar.style.width = pct + '%';
+    if (pct >= 100) {
+      clearInterval(interval);
+      // Close modal & fire success callback after short delay
+      setTimeout(() => {
+        closeUPIScanner();
+        if (typeof _upiContext.onSuccess === 'function') {
+          _upiContext.onSuccess();
+        } else if (typeof simulateScannerResult === 'function') {
+          // Fallback: call existing portal.js success handler
+          simulateScannerResult();
+        } else if (typeof window._upiSuccessCallback === 'function') {
+          window._upiSuccessCallback();
+        }
+      }, 400);
+    }
+  }, 25); // ~1.25s total
+}
+
+// ── Close modal ───────────────────────────────────────────────
+function closeUPIScanner() {
+  document.getElementById('scanner-overlay').style.display = 'none';
+  document.getElementById('upi-scanner').style.display     = 'none';
+  document.body.style.overflow = '';
+  // Reset progress
+  const bar = document.getElementById('upi-progress-bar');
+  if (bar) bar.style.width = '0%';
+}
+
+// ── Intercept portal.js UPI trigger ──────────────────────────
+// portal.js calls openUPIScanner(amount, label, cb) — we handle it
+window.openUPIScanner = function(amount, label, cb) {
+  openUPIScannerWithAmount(amount || 0, label || '', cb);
+};
+
+// ── Patch: intercept checkout payment step rendering ─────────
+// Wait for portal.js to load, then patch the UPI QR option click
+document.addEventListener('DOMContentLoaded', function() {
+  // Re-observe checkout-inner & buyNow-modal-inner for UPI option injection
+  const patchUPIButtons = () => {
+    document.querySelectorAll('[onclick*="showQR"], [onclick*="selectUPI"], .upi-qr-btn, [data-pay="upi-qr"]').forEach(btn => {
+      if (btn.dataset.patched) return;
+      btn.dataset.patched = 'true';
+      const originalOnclick = btn.getAttribute('onclick');
+      btn.removeAttribute('onclick');
+      btn.addEventListener('click', () => {
+        // Try to read amount from DOM
+        let amount = 0;
+        const amtEls = document.querySelectorAll('.checkout-total, .pay-total, #cart-total-val, .tbm-price');
+        amtEls.forEach(el => {
+          const n = parseInt((el.textContent||'').replace(/[^0-9]/g,''));
+          if (n > 0) amount = n;
+        });
+        openUPIScannerWithAmount(amount, 'IPL Order', null);
+      });
+    });
+  };
+
+  const observer = new MutationObserver(patchUPIButtons);
+  ['checkout-inner','buyNow-modal-inner','cart-footer'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) observer.observe(el, { childList:true, subtree:true });
+  });
+});
+</script>
 </body>
 </html>

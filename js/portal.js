@@ -269,6 +269,7 @@ let sizePick={jid:null,size:null,qty:1};
 function openAddJersey(jid){
   const j=JERSEYS.find(x=>x.id===jid);
   if(!j||!j.inStock)return;
+  activeCheckoutType='buyNow';
   sizePick={jid,size:j.sizes[0],qty:1};
   renderSizePicker();
   document.getElementById('buyNow-modal').classList.add('open');
@@ -330,6 +331,7 @@ let merchPick={mid:null,qty:1};
 function openAddMerch(mid){
   const m=MERCHANDISE.find(x=>x.id===mid);
   if(!m)return;
+  activeCheckoutType='buyNow';
   merchPick={mid,qty:1};
   renderMerchPicker();
   document.getElementById('buyNow-modal').classList.add('open');
@@ -440,24 +442,60 @@ function renderBuyNow(){
       <div class="pay-summary-box" style="font-size:0.78rem;color:var(--text-muted)">📦 ${item.name}${size?' · Size '+size:''} · Qty ${qty} · Total ₹${grand.toLocaleString()}</div>
       <div style="display:flex;gap:8px"><button class="tbm-add-cart-btn" style="background:var(--bg-card3);color:var(--text-secondary);flex:0.4" onclick="bnStep(1)">← BACK</button><button class="tbm-add-cart-btn" style="flex:1" onclick="bnStep(3)">CONTINUE TO PAYMENT →</button></div>`;
   } else if(step===3){
+    let paymentForm='';
+    if(currentPaymentMethod==='card'){
+      paymentForm=`
+        <div class="checkout-form" style="margin-top:0.75rem">
+          <div class="form-field"><label>Card Number *</label><input id="card-number" placeholder="4242 4242 4242 4242" maxlength="19" oninput="fmtCard(this)"></div>
+          <div class="checkout-two-col"><div class="form-field"><label>MM/YY *</label><input id="card-mmyy" placeholder="12/27" maxlength="5"></div><div class="form-field"><label>CVV *</label><input id="card-cvv" placeholder="•••" maxlength="3" type="password"></div></div>
+          <div class="form-field"><label>Name on Card *</label><input id="card-name" placeholder="RAHUL SHARMA"></div>
+          <div class="payment-info-box">
+            <span style="font-size:0.7rem;color:var(--text-muted)">💳 Test card: 4242 4242 4242 4242 · Exp: 12/27 · CVV: 123</span>
+          </div>
+        </div>`;
+    } else if(currentPaymentMethod==='upi'){
+      paymentForm=`
+        <div class="checkout-form" style="margin-top:0.75rem">
+          <div class="form-field">
+            <label>Payment Method *</label>
+            <select id="upi-scan-method" style="padding:8px;border:1px solid var(--border);border-radius:6px;background:var(--bg-card2);color:var(--text-primary)">
+              <option value="manual">📝 Enter UPI ID</option>
+              <option value="scan">📱 Scan QR Code</option>
+            </select>
+          </div>
+          <div id="upi-manual-form">
+            <div class="form-field"><label>UPI ID *</label><input id="upi-id" placeholder="username@bank (e.g. user@okhdfcbank)" oninput="this.value=this.value.toLowerCase()"></div>
+            <div class="payment-info-box">
+              <span style="font-size:0.7rem;color:var(--text-muted)">💸 Test UPI: user@okhdfcbank · google.pay@bankname · phonepe@upi</span>
+            </div>
+          </div>
+          <div id="upi-scan-form" style="display:none;text-align:center;padding:1rem;background:var(--bg-card2);border-radius:8px;border:1px dashed var(--border)">
+            <div style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:1rem">Point your camera at the QR code</div>
+            <button class="tbm-add-cart-btn" onclick="openUPIScanner()" style="margin:0 auto;display:block;max-width:200px">📷 OPEN SCANNER</button>
+          </div>
+        </div>`;
+    } else {
+      paymentForm=`
+        <div class="checkout-form" style="margin-top:0.75rem;text-align:center;padding:1.5rem;background:var(--bg-card2);border-radius:8px;border:1px solid var(--border)">
+          <div style="font-size:1rem;color:var(--text-secondary);margin-bottom:1rem">🏦 Redirecting to your bank...</div>
+          <div style="font-size:0.75rem;color:var(--text-muted)">You will be securely redirected to your bank's website</div>
+        </div>`;
+    }
+
     body=`
       <div class="tbm-section-title">CHOOSE PAYMENT METHOD</div>
       <div class="payment-methods">
-        <div class="pm-option selected" onclick="selectPM(this)"><span class="pm-icon">💳</span>Credit / Debit Card</div>
-        <div class="pm-option" onclick="selectPM(this)"><span class="pm-icon">📱</span>UPI / GPay / PhonePe</div>
-        <div class="pm-option" onclick="selectPM(this)"><span class="pm-icon">🏦</span>Net Banking</div>
+        <div class="pm-option${currentPaymentMethod==='card'?' selected':''}" onclick="selectPM(this)"><span class="pm-icon">💳</span>Credit / Debit Card</div>
+        <div class="pm-option${currentPaymentMethod==='upi'?' selected':''}" onclick="selectPM(this)"><span class="pm-icon">📱</span>UPI / GPay / PhonePe</div>
+        <div class="pm-option${currentPaymentMethod==='netbanking'?' selected':''}" onclick="selectPM(this)"><span class="pm-icon">🏦</span>Net Banking</div>
       </div>
-      <div class="checkout-form" style="margin-top:0.75rem">
-        <div class="form-field"><label>Card Number</label><input placeholder="4242 4242 4242 4242" maxlength="19" oninput="fmtCard(this)"></div>
-        <div class="checkout-two-col"><div class="form-field"><label>MM/YY</label><input placeholder="12/27" maxlength="5"></div><div class="form-field"><label>CVV</label><input placeholder="•••" maxlength="3" type="password"></div></div>
-        <div class="form-field"><label>Name on Card</label><input placeholder="RAHUL SHARMA"></div>
-      </div>
+      ${paymentForm}
       <div class="pay-summary-box">
         <div class="pay-row"><span>${item.name}${size?' · '+size:''} × ${qty}</span><span>₹${total.toLocaleString()}</span></div>
         <div class="pay-row"><span>Delivery</span><span style="color:var(--accent-green)">${delivery===0?'FREE':'₹'+delivery}</span></div>
         <div class="pay-row grand"><span>TOTAL</span><span>₹${grand.toLocaleString()}</span></div>
       </div>
-      <div style="display:flex;gap:8px"><button class="tbm-add-cart-btn" style="background:var(--bg-card3);color:var(--text-secondary);flex:0.4" onclick="bnStep(2)">← BACK</button><button class="tbm-add-cart-btn" style="flex:1" onclick="bnStep(4)">🔒 PAY ₹${grand.toLocaleString()} SECURELY →</button></div>`;
+      <div style="display:flex;gap:8px"><button class="tbm-add-cart-btn" style="background:var(--bg-card3);color:var(--text-secondary);flex:0.4" onclick="bnStep(2)">← BACK</button><button class="tbm-add-cart-btn" style="flex:1" onclick="processPayment()">🔒 PAY ₹${grand.toLocaleString()} SECURELY →</button></div>`;
   } else if(step===4){
     const orderId=type[0].toUpperCase()+'RS-'+Math.random().toString(36).slice(2,8).toUpperCase();
     saveOrderToUser({
@@ -495,13 +533,378 @@ function renderBuyNow(){
     :`<div class="tbm-header"><div class="tbm-match-title">🛍️ BUY NOW</div><div class="tbm-meta">IPL Official Merchandise</div></div>`;
 
   document.getElementById('buyNow-modal-inner').innerHTML=`${step<4?hdr:''}<div class="checkout-steps" style="margin-bottom:1.5rem">${stepsHtml}</div>${body}`;
+  bindUPIMethodToggle();
 }
 
 window.bnSelectSize=(s)=>{buyNowState.size=s;renderBuyNow();};
 window.bnQty=(d)=>{buyNowState.qty=Math.max(1,Math.min(10,buyNowState.qty+d));renderBuyNow();};
 window.bnStep=(s)=>{ if(s===3 && !validateBuyNowDetails()) return; buyNowState.step=s; renderBuyNow(); };
-window.selectPM=(el)=>{document.querySelectorAll('.pm-option').forEach(b=>b.classList.remove('selected'));el.classList.add('selected');};
-window.fmtCard=(el)=>{el.value=el.value.replace(/\D/g,'').replace(/(.{4})/g,'$1 ').trim().slice(0,19);};
+
+// ════════════════════════════════════════════════════════════════
+// PAYMENT METHOD TRACKING & RENDERING
+// ════════════════════════════════════════════════════════════════
+let currentPaymentMethod='card';
+let activeCheckoutType='buyNow';
+window.selectPM=(el)=>{
+  document.querySelectorAll('.pm-option').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+  const methodText=el.textContent.trim();
+  if(methodText.includes('Credit')||methodText.includes('Debit')||methodText.includes('Card')){
+    currentPaymentMethod='card';
+  } else if(methodText.includes('UPI')||methodText.includes('GPay')||methodText.includes('PhonePe')){
+    currentPaymentMethod='upi';
+  } else {
+    currentPaymentMethod='netbanking';
+  }
+  if(activeCheckoutType==='ticket') renderTicketModal();
+  else if(activeCheckoutType==='buyNow') renderBuyNow();
+  else if(activeCheckoutType==='cart') renderCheckoutModal();
+};
+
+window.bindUPIMethodToggle=()=>{
+  const modeSelect=document.getElementById('upi-scan-method');
+  const manualForm=document.getElementById('upi-manual-form');
+  const scanForm=document.getElementById('upi-scan-form');
+  if(!modeSelect || !manualForm || !scanForm) return;
+  const updateVisibility=()=>{
+    const mode=modeSelect.value;
+    manualForm.style.display = mode==='manual' ? 'block' : 'none';
+    scanForm.style.display = mode==='scan' ? 'block' : 'none';
+  };
+  modeSelect.removeEventListener('change', modeSelect._upiListener);
+  modeSelect._upiListener = updateVisibility;
+  modeSelect.addEventListener('change', updateVisibility);
+  updateVisibility();
+};
+
+window.fmtCard=(el)=>{
+  el.value=el.value.replace(/\D/g,'').replace(/(.{4})/g,'$1 ').trim().slice(0,19);
+};
+
+// ════════════════════════════════════════════════════════════════
+// CARD VALIDATION & PAYMENT PROCESSING
+// ════════════════════════════════════════════════════════════════
+window.validateCardPayment=()=>{
+  const cardNum=document.getElementById('card-number')?.value?.replace(/\s/g,'') || '';
+  const mmyy=document.getElementById('card-mmyy')?.value || '';
+  const cvv=document.getElementById('card-cvv')?.value || '';
+  const name=document.getElementById('card-name')?.value || '';
+
+  if(!cardNum.trim()){
+    showToast('❌ Please enter card number','error');
+    document.getElementById('card-number')?.focus();
+    return false;
+  }
+  if(cardNum.length!==16||!/^\d+$/.test(cardNum)){
+    showToast('❌ Card number must be 16 digits','error');
+    document.getElementById('card-number')?.focus();
+    return false;
+  }
+  if(!mmyy.trim()){
+    showToast('❌ Please enter MM/YY','error');
+    document.getElementById('card-mmyy')?.focus();
+    return false;
+  }
+  if(!/^\d{2}\/\d{2}$/.test(mmyy)){
+    showToast('❌ MM/YY format invalid (use MM/YY)','error');
+    document.getElementById('card-mmyy')?.focus();
+    return false;
+  }
+  const[mm,yy]=mmyy.split('/');
+  if(parseInt(mm)<1||parseInt(mm)>12){
+    showToast('❌ Invalid month (01-12)','error');
+    document.getElementById('card-mmyy')?.focus();
+    return false;
+  }
+  if(!cvv.trim()){
+    showToast('❌ Please enter CVV','error');
+    document.getElementById('card-cvv')?.focus();
+    return false;
+  }
+  if(cvv.length!==3||!/^\d+$/.test(cvv)){
+    showToast('❌ CVV must be 3 digits','error');
+    document.getElementById('card-cvv')?.focus();
+    return false;
+  }
+  if(!name.trim()){
+    showToast('❌ Please enter cardholder name','error');
+    document.getElementById('card-name')?.focus();
+    return false;
+  }
+  return true;
+};
+
+window.validateUPIPayment=()=>{
+  const upiId=document.getElementById('upi-id')?.value || '';
+  const scanMethod=document.getElementById('upi-scan-method')?.value || 'manual';
+  
+  if(scanMethod==='manual'){
+    if(!upiId.trim()){
+      showToast('❌ Please enter UPI ID','error');
+      document.getElementById('upi-id')?.focus();
+      return false;
+    }
+    // Basic UPI ID validation (upihandle@bank)
+    const upiPattern=/^[a-zA-Z0-9._-]+@[a-zA-Z0-9]+$/;
+    if(!upiPattern.test(upiId)){
+      showToast('❌ Invalid UPI ID format (use: username@bank)','error');
+      document.getElementById('upi-id')?.focus();
+      return false;
+    }
+  } else if(scanMethod==='scan'){
+    showToast('⏳ Please scan your QR code','info');
+    // Scanner will handle the rest
+  }
+  return true;
+};
+
+window.processCardPayment=()=>{
+  if(!validateCardPayment())return;
+  showToast('💳 Processing card payment...','info');
+  setTimeout(()=>{
+    const cardLast4=document.getElementById('card-number')?.value?.replace(/\s/g,'')?.slice(-4) || '****';
+    showToast('✅ Payment successful! Card ending in '+cardLast4,'success');
+    buyNowState.step=4;
+    renderBuyNow();
+  },1200);
+};
+
+window.processUPIPayment=()=>{
+  if(!validateUPIPayment())return;
+  const scanMethod=document.getElementById('upi-scan-method')?.value || 'manual';
+  if(scanMethod==='manual'){
+    const upiId=document.getElementById('upi-id')?.value;
+    showToast('💸 Processing UPI payment...','info');
+    setTimeout(()=>{
+      showToast('✅ Payment successful! UPI: '+upiId,'success');
+      buyNowState.step=4;
+      renderBuyNow();
+    },1200);
+  } else {
+    openUPIScanner();
+  }
+};
+
+window.processPayment=()=>{
+  activeCheckoutType='buyNow';
+  if(currentPaymentMethod==='card'){
+    processCardPayment();
+  } else if(currentPaymentMethod==='upi'){
+    processUPIPayment();
+  } else {
+    showToast('✅ Payment successful!','success');
+    buyNowState.step=4;
+    renderBuyNow();
+  }
+};
+
+// UPI QR Scanner with realistic QR display
+window.openUPIScanner=()=>{
+  const scanner=document.getElementById('upi-scanner');
+  if(!scanner)return;
+  scanner.style.display='block';
+  document.getElementById('scanner-overlay').style.display='block';
+  
+  const video=document.getElementById('scanner-video');
+  if(!video)return;
+  
+  // Show a generated UPI QR code (using text-based QR for simulation)
+  const generateQRPlaceholder=()=>{
+    // Generate a mock QR code pattern
+    const canvas=document.createElement('canvas');
+    canvas.width=300;
+    canvas.height=300;
+    const ctx=canvas.getContext('2d');
+    
+    // Draw QR pattern background
+    ctx.fillStyle='#ffffff';
+    ctx.fillRect(0,0,300,300);
+    
+    // Draw QR position markers (three corners)
+    const drawPositionMarker=(x,y)=>{
+      ctx.fillStyle='#000000';
+      ctx.fillRect(x,y,70,70);
+      ctx.fillStyle='#ffffff';
+      ctx.fillRect(x+10,y+10,50,50);
+      ctx.fillStyle='#000000';
+      ctx.fillRect(x+20,y+20,30,30);
+    };
+    drawPositionMarker(0,0);
+    drawPositionMarker(230,0);
+    drawPositionMarker(0,230);
+    
+    // Draw timing patterns
+    ctx.fillStyle='#000000';
+    for(let i=8;i<292;i+=2){
+      ctx.fillRect(i,6,2,2);
+      ctx.fillRect(6,i,2,2);
+    }
+    
+    // Draw random QR data pattern
+    ctx.fillStyle='#000000';
+    for(let i=0;i<250;i++){
+      const x=Math.floor(Math.random()*280)+10;
+      const y=Math.floor(Math.random()*280)+10;
+      if((x<60||x>230)&&(y<60||y>230))continue;
+      if(x<8||y<8)continue;
+      ctx.fillRect(x,y,2,2);
+    }
+    
+    // Display UPI info below QR
+    const upiText='upi://pay?pa=ipl.portal@okhdfcbank';
+    ctx.fillStyle='#000000';
+    ctx.font='12px monospace';
+    ctx.textAlign='center';
+    ctx.fillText('📱 SCAN TO PAY',150,295);
+    
+    return canvas.toDataURL();
+  };
+  
+  // Try camera access first, fallback to QR placeholder
+  const placeholder=document.getElementById('scanner-placeholder');
+  const showPlaceholder=(src)=>{
+    if(!placeholder) return;
+    placeholder.src=src;
+    placeholder.style.display='block';
+    video.style.display='none';
+  };
+  const showVideo=()=>{
+    if(!placeholder) return;
+    placeholder.style.display='none';
+    video.style.display='block';
+  };
+
+  navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}})
+    .then(stream=>{
+      video.srcObject=stream;
+      showVideo();
+    })
+    .catch(err=>{
+      console.warn('Camera access not available, showing QR placeholder');
+      showPlaceholder(generateQRPlaceholder());
+    });
+};
+
+window.closeUPIScanner=()=>{
+  document.getElementById('upi-scanner').style.display='none';
+  document.getElementById('scanner-overlay').style.display='none';
+  const video=document.getElementById('scanner-video');
+  const placeholder=document.getElementById('scanner-placeholder');
+  if(video){
+    if(video.srcObject&&typeof video.srcObject.getTracks==='function'){
+      video.srcObject.getTracks().forEach(track=>track.stop());
+    }
+    video.srcObject=null;
+    video.style.display='none';
+  }
+  if(placeholder){
+    placeholder.src='';
+    placeholder.style.display='none';
+  }
+};
+
+window.simulateScannerResult=()=>{
+  const mockUPI='user@okhdfcbank';
+  showToast('✅ QR Scanned! Processing payment...','info');
+  closeUPIScanner();
+  setTimeout(()=>{
+    showToast('✅ Payment successful! UPI: '+mockUPI,'success');
+    if(activeCheckoutType==='buyNow'){
+      buyNowState.step=4;
+      renderBuyNow();
+    } else if(activeCheckoutType==='ticket'){
+      ticketState.step=5;
+      renderTicketModal();
+    }
+  },1200);
+};
+
+window.processTicketPayment=()=>{
+  activeCheckoutType='ticket';
+  if(currentPaymentMethod==='card'){
+    if(!validateCardPayment())return;
+    showToast('💳 Processing card payment...','info');
+    setTimeout(()=>{
+      showToast('✅ Payment successful! Card ending in '+document.getElementById('card-number')?.value?.slice(-4),'success');
+      ticketState.step=5;
+      renderTicketModal();
+    },1200);
+  } else if(currentPaymentMethod==='upi'){
+    if(!validateUPIPayment())return;
+    const scanMethod=document.getElementById('upi-scan-method')?.value || 'manual';
+    if(scanMethod==='manual'){
+      const upiId=document.getElementById('upi-id')?.value;
+      showToast('💸 Processing UPI payment...','info');
+      setTimeout(()=>{
+        showToast('✅ Payment successful! UPI: '+upiId,'success');
+        ticketState.step=5;
+        renderTicketModal();
+      },1200);
+    } else {
+      openUPIScanner();
+    }
+  } else {
+    showToast('✅ Payment successful!','success');
+    ticketState.step=5;
+    renderTicketModal();
+  }
+};
+
+// Cart Payment Processing
+window.validateCartCardPayment=()=>{
+  const cardNum=document.getElementById('co-card-number')?.value?.replace(/\s/g,'') || '';
+  const mmyy=document.getElementById('co-card-mmyy')?.value || '';
+  const cvv=document.getElementById('co-card-cvv')?.value || '';
+  const name=document.getElementById('co-card-name')?.value || '';
+
+  if(!cardNum.trim()){showToast('❌ Please enter card number','error');return false;}
+  if(cardNum.length!==16||!/^\d+$/.test(cardNum)){showToast('❌ Card number must be 16 digits','error');return false;}
+  if(!mmyy.trim()){showToast('❌ Please enter MM/YY','error');return false;}
+  if(!/^\d{2}\/\d{2}$/.test(mmyy)){showToast('❌ MM/YY format invalid (use MM/YY)','error');return false;}
+  if(!cvv.trim()){showToast('❌ Please enter CVV','error');return false;}
+  if(cvv.length!==3||!/^\d+$/.test(cvv)){showToast('❌ CVV must be 3 digits','error');return false;}
+  if(!name.trim()){showToast('❌ Please enter cardholder name','error');return false;}
+  return true;
+};
+
+window.validateCartUPIPayment=()=>{
+  const upiId=document.getElementById('co-upi-id')?.value || '';
+  const scanMethod=document.getElementById('upi-scan-method')?.value || 'manual';
+  if(scanMethod==='manual'){
+    if(!upiId.trim()){showToast('❌ Please enter UPI ID','error');return false;}
+    const upiPattern=/^[a-zA-Z0-9._-]+@[a-zA-Z0-9]+$/;
+    if(!upiPattern.test(upiId)){showToast('❌ Invalid UPI ID format (use: username@bank)','error');return false;}
+  }
+  return true;
+};
+
+window.processCartPayment=(total)=>{
+  activeCheckoutType='cart';
+  if(currentPaymentMethod==='card'){
+    if(!validateCartCardPayment())return;
+    showToast('💳 Processing card payment...','info');
+    setTimeout(()=>{
+      showToast('✅ Payment successful! Card ending in '+document.getElementById('co-card-number')?.value?.slice(-4),'success');
+      goCheckoutStep(3);
+    },1200);
+  } else if(currentPaymentMethod==='upi'){
+    if(!validateCartUPIPayment())return;
+    const scanMethod=document.getElementById('upi-scan-method')?.value || 'manual';
+    if(scanMethod==='manual'){
+      const upiId=document.getElementById('co-upi-id')?.value;
+      showToast('💸 Processing UPI payment...','info');
+      setTimeout(()=>{
+        showToast('✅ Payment successful! UPI: '+upiId,'success');
+        goCheckoutStep(3);
+      },1200);
+    } else {
+      openUPIScanner();
+    }
+  } else {
+    showToast('✅ Payment successful!','success');
+    goCheckoutStep(3);
+  }
+};
 
 // ================================================================
 // TICKET BOOKING — 5-step flow with STADIUM SEAT MAP
@@ -829,6 +1232,7 @@ function buildSeatGrid(stand,zd,qty,price,selected){
 function openTicketBooking(matchId){
   const m=IPL_MATCHES.find(x=>x.id===matchId);
   if(!m)return;
+  activeCheckoutType='ticket';
   ticketState={matchId,stand:m.prices[0].stand,qty:1,step:1,zone:null,block:null,selectedSeats:[],seats:null,seatStep:1};
   renderTicketModal();
   document.getElementById('buyNow-modal').classList.add('open');
@@ -911,24 +1315,61 @@ function renderTicketModal(){
 
   // ── STEP 4: PAYMENT ───────────────────────────────────────
   else if(step===4){
+    let paymentForm='';
+    if(currentPaymentMethod==='card'){
+      paymentForm=`
+        <div class="checkout-form" style="margin-top:0.75rem">
+          <div class="form-field"><label>Card Number *</label><input id="card-number" placeholder="4242 4242 4242 4242" maxlength="19" oninput="fmtCard(this)"></div>
+          <div class="checkout-two-col"><div class="form-field"><label>MM/YY *</label><input id="card-mmyy" placeholder="12/27" maxlength="5"></div><div class="form-field"><label>CVV *</label><input id="card-cvv" placeholder="•••" maxlength="3" type="password"></div></div>
+          <div class="form-field"><label>Name on Card *</label><input id="card-name" placeholder="RAHUL SHARMA"></div>
+          <div class="payment-info-box">
+            <span style="font-size:0.7rem;color:var(--text-muted)">💳 Test card: 4242 4242 4242 4242 · Exp: 12/27 · CVV: 123</span>
+          </div>
+        </div>`;
+    } else if(currentPaymentMethod==='upi'){
+      paymentForm=`
+        <div class="checkout-form" style="margin-top:0.75rem">
+          <div class="form-field">
+            <label>Payment Method *</label>
+            <select id="upi-scan-method" style="padding:8px;border:1px solid var(--border);border-radius:6px;background:var(--bg-card2);color:var(--text-primary)">
+              <option value="manual">📝 Enter UPI ID</option>
+              <option value="scan">📱 Scan QR Code</option>
+            </select>
+          </div>
+          <div id="upi-manual-form">
+            <div class="form-field"><label>UPI ID *</label><input id="upi-id" placeholder="username@bank (e.g. user@okhdfcbank)" oninput="this.value=this.value.toLowerCase()"></div>
+            <div class="payment-info-box">
+              <span style="font-size:0.7rem;color:var(--text-muted)">💸 Test UPI: user@okhdfcbank · google.pay@bankname · phonepe@upi</span>
+            </div>
+          </div>
+          <div id="upi-scan-form" style="display:none;text-align:center;padding:1rem;background:var(--bg-card2);border-radius:8px;border:1px dashed var(--border)">
+            <div style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:1rem">Point your camera at the QR code</div>
+            <button class="tbm-add-cart-btn" onclick="openUPIScanner()" style="margin:0 auto;display:block;max-width:200px">📷 OPEN SCANNER</button>
+          </div>
+        </div>`;
+    } else {
+      paymentForm=`
+        <div class="checkout-form" style="margin-top:0.75rem;text-align:center;padding:1.5rem;background:var(--bg-card2);border-radius:8px;border:1px solid var(--border)">
+          <div style="font-size:1rem;color:var(--text-secondary);margin-bottom:1rem">🏦 Redirecting to your bank...</div>
+          <div style="font-size:0.75rem;color:var(--text-muted)">You will be securely redirected to your bank's website</div>
+        </div>`;
+    }
+
     body=`
       <div class="tbm-section-title">CHOOSE PAYMENT METHOD</div>
       <div class="payment-methods">
-        <div class="pm-option selected" onclick="selectPM(this)"><span class="pm-icon">💳</span>Credit / Debit Card</div>
-        <div class="pm-option" onclick="selectPM(this)"><span class="pm-icon">📱</span>UPI / GPay / PhonePe</div>
-        <div class="pm-option" onclick="selectPM(this)"><span class="pm-icon">🏦</span>Net Banking</div>
+        <div class="pm-option${currentPaymentMethod==='card'?' selected':''}" onclick="selectPM(this)"><span class="pm-icon">💳</span>Credit / Debit Card</div>
+        <div class="pm-option${currentPaymentMethod==='upi'?' selected':''}" onclick="selectPM(this)"><span class="pm-icon">📱</span>UPI / GPay / PhonePe</div>
+        <div class="pm-option${currentPaymentMethod==='netbanking'?' selected':''}" onclick="selectPM(this)"><span class="pm-icon">🏦</span>Net Banking</div>
       </div>
-      <div class="checkout-form" style="margin-top:0.75rem">
-        <div class="form-field"><label>Card Number</label><input placeholder="4242 4242 4242 4242" maxlength="19" oninput="fmtCard(this)"></div>
-        <div class="checkout-two-col"><div class="form-field"><label>MM/YY</label><input placeholder="12/27" maxlength="5"></div><div class="form-field"><label>CVV</label><input placeholder="•••" maxlength="3" type="password"></div></div>
-      </div>
+      ${paymentForm}
       <div class="pay-summary-box">
         <div class="pay-row"><span>${qty} × ${stand}</span><span>₹${total.toLocaleString()}</span></div>
         <div class="pay-row"><span>Seats</span><span style="color:var(--accent-gold);font-family:Space Mono,monospace;font-size:0.72rem">${ticketState.selectedSeats.join(', ')}</span></div>
         <div class="pay-row"><span>GST (18%)</span><span>₹${gst.toLocaleString()}</span></div>
         <div class="pay-row grand"><span>TOTAL</span><span>₹${grand.toLocaleString()}</span></div>
       </div>
-      <div style="display:flex;gap:8px"><button class="tbm-add-cart-btn" style="background:var(--bg-card3);color:var(--text-secondary);flex:0.4" onclick="tsStep(3)">← BACK</button><button class="tbm-add-cart-btn" style="flex:1" onclick="tsStep(5)">🔒 PAY ₹${grand.toLocaleString()} SECURELY →</button></div>`;
+      <div style="display:flex;gap:8px"><button class="tbm-add-cart-btn" style="background:var(--bg-card3);color:var(--text-secondary);flex:0.4" onclick="tsStep(3)">← BACK</button><button class="tbm-add-cart-btn" style="flex:1" onclick="processTicketPayment()">🔒 PAY ₹${grand.toLocaleString()} SECURELY →</button></div>`;
   }
 
   // ── STEP 5: CONFIRMED ─────────────────────────────────────
@@ -973,6 +1414,7 @@ function renderTicketModal(){
     <div class="tbm-header"><div class="tbm-match-title">${m.team1} <span style="color:var(--text-muted);font-size:0.9rem">vs</span> ${m.team2}</div><div class="tbm-meta">📅 ${m.date} · ⏰ ${m.time} · 📍 ${m.venue}</div></div>
     <div class="checkout-steps" style="margin-bottom:1.5rem">${stepsHtml}</div>
     ${body}`;
+  bindUPIMethodToggle();
 }
 
 window.tsSelectStand=(s)=>{ticketState.stand=s;ticketState.seats=null;ticketState.selectedSeats=[];ticketState.block=null;renderTicketModal();};
@@ -1034,26 +1476,63 @@ function renderCheckoutModal(){
     </div>
     <button class="checkout-btn" onclick="proceedToMerchPayment()" style="margin-top:1rem">CONTINUE TO PAYMENT →</button>`;
   } else if(checkoutStep===2){
-    body=`<h3 style="font-family:Oswald,sans-serif;font-size:1.3rem;margin-bottom:1rem;letter-spacing:1px">PAYMENT METHOD</h3>
-    <div class="payment-methods">
-      <div class="pm-option selected" onclick="selectPM(this)"><span class="pm-icon">💳</span>Credit/Debit Card</div>
-      <div class="pm-option" onclick="selectPM(this)"><span class="pm-icon">📱</span>UPI / GPay</div>
-      <div class="pm-option" onclick="selectPM(this)"><span class="pm-icon">🏦</span>Net Banking</div>
-    </div>
-    <div class="checkout-form" style="margin-top:0.75rem">
-      <div class="form-field"><label>Card Number</label><input placeholder="4242 4242 4242 4242" maxlength="19" oninput="fmtCard(this)"></div>
-      <div class="checkout-two-col"><div class="form-field"><label>MM/YY</label><input placeholder="12/27" maxlength="5"></div><div class="form-field"><label>CVV</label><input placeholder="•••" maxlength="3" type="password"></div></div>
-    </div>
-    <div class="pay-summary-box">
-      <div class="pay-row"><span>Subtotal</span><span>₹${subtotal.toLocaleString()}</span></div>
-      ${discount>0?`<div class="pay-row"><span>Discount</span><span style="color:var(--accent-green)">-₹${discount.toLocaleString()}</span></div>`:''}
-      <div class="pay-row"><span>Delivery</span><span style="color:var(--accent-green)">FREE</span></div>
-      <div class="pay-row grand"><span>TOTAL</span><span>₹${total.toLocaleString()}</span></div>
-    </div>
-    <div style="display:flex;gap:8px">
-      <button class="checkout-btn" style="background:var(--bg-card3);color:var(--text-secondary);flex:0.4" onclick="goCheckoutStep(1)">← BACK</button>
-      <button class="checkout-btn" style="flex:1" onclick="goCheckoutStep(3)">🔒 PAY ₹${total.toLocaleString()} →</button>
-    </div>`;
+    let paymentForm='';
+    if(currentPaymentMethod==='card'){
+      paymentForm=`
+        <div class="checkout-form" style="margin-top:0.75rem">
+          <div class="form-field"><label>Card Number *</label><input id="co-card-number" placeholder="4242 4242 4242 4242" maxlength="19" oninput="fmtCard(this)"></div>
+          <div class="checkout-two-col"><div class="form-field"><label>MM/YY *</label><input id="co-card-mmyy" placeholder="12/27" maxlength="5"></div><div class="form-field"><label>CVV *</label><input id="co-card-cvv" placeholder="•••" maxlength="3" type="password"></div></div>
+          <div class="form-field"><label>Name on Card *</label><input id="co-card-name" placeholder="RAHUL SHARMA"></div>
+          <div class="payment-info-box">
+            <span style="font-size:0.7rem;color:var(--text-muted)">💳 Test card: 4242 4242 4242 4242 · Exp: 12/27 · CVV: 123</span>
+          </div>
+        </div>`;
+    } else if(currentPaymentMethod==='upi'){
+      paymentForm=`
+        <div class="checkout-form" style="margin-top:0.75rem">
+          <div class="form-field">
+            <label>Payment Method *</label>
+            <select id="upi-scan-method" style="padding:8px;border:1px solid var(--border);border-radius:6px;background:var(--bg-card2);color:var(--text-primary)">
+              <option value="manual">📝 Enter UPI ID</option>
+              <option value="scan">📱 Scan QR Code</option>
+            </select>
+          </div>
+          <div id="upi-manual-form">
+            <div class="form-field"><label>UPI ID *</label><input id="co-upi-id" placeholder="username@bank (e.g. user@okhdfcbank)" oninput="this.value=this.value.toLowerCase()"></div>
+            <div class="payment-info-box">
+              <span style="font-size:0.7rem;color:var(--text-muted)">💸 Test UPI: user@okhdfcbank · google.pay@bankname · phonepe@upi</span>
+            </div>
+          </div>
+          <div id="upi-scan-form" style="display:none;text-align:center;padding:1rem;background:var(--bg-card2);border-radius:8px;border:1px dashed var(--border)">
+            <div style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:1rem">Point your camera at the QR code</div>
+            <button class="tbm-add-cart-btn" onclick="openUPIScanner()" style="margin:0 auto;display:block;max-width:200px">📷 OPEN SCANNER</button>
+          </div>
+        </div>`;
+    } else {
+      paymentForm=`
+        <div class="checkout-form" style="margin-top:0.75rem;text-align:center;padding:1.5rem;background:var(--bg-card2);border-radius:8px;border:1px solid var(--border)">
+          <div style="font-size:1rem;color:var(--text-secondary);margin-bottom:1rem">🏦 Redirecting to your bank...</div>
+          <div style="font-size:0.75rem;color:var(--text-muted)">You will be securely redirected to your bank's website</div>
+        </div>`;
+    }
+    body=`
+      <h3 style="font-family:Oswald,sans-serif;font-size:1.3rem;margin-bottom:1rem;letter-spacing:1px">CHOOSE PAYMENT METHOD</h3>
+      <div class="payment-methods">
+        <div class="pm-option${currentPaymentMethod==='card'?' selected':''}" onclick="selectPM(this)"><span class="pm-icon">💳</span>Credit / Debit Card</div>
+        <div class="pm-option${currentPaymentMethod==='upi'?' selected':''}" onclick="selectPM(this)"><span class="pm-icon">📱</span>UPI / GPay / PhonePe</div>
+        <div class="pm-option${currentPaymentMethod==='netbanking'?' selected':''}" onclick="selectPM(this)"><span class="pm-icon">🏦</span>Net Banking</div>
+      </div>
+      ${paymentForm}
+      <div class="pay-summary-box">
+        <div class="pay-row"><span>Subtotal</span><span>₹${subtotal.toLocaleString()}</span></div>
+        ${discount>0?`<div class="pay-row"><span>Discount</span><span style="color:var(--accent-green)">-₹${discount.toLocaleString()}</span></div>`:''}
+        <div class="pay-row"><span>Delivery</span><span style="color:var(--accent-green)">FREE</span></div>
+        <div class="pay-row grand"><span>TOTAL</span><span>₹${total.toLocaleString()}</span></div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="checkout-btn" style="background:var(--bg-card3);color:var(--text-secondary);flex:0.4" onclick="goCheckoutStep(1)">← BACK</button>
+        <button class="checkout-btn" style="flex:1" onclick="processCartPayment(${total})">🔒 PAY ₹${total.toLocaleString()} SECURELY →</button>
+      </div>`;
   } else if(checkoutStep===3){
     const orderId='IPL-'+Math.random().toString(36).slice(2,8).toUpperCase();
     const subtotalPaid = subtotal - discount;
